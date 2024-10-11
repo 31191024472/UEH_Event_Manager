@@ -1,0 +1,10 @@
+# Visual Studio
+.vs/
+*.sln
+*.csproj
+*.user
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.tmp
