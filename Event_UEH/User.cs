@@ -13,7 +13,7 @@ namespace Event_UEH
         public int RoleId { get; set; }
 
         // Đăng ký người dùng mới
-        private static void RegisterUser()
+        public static void RegisterUser()
         {
             Console.Clear();
             Console.WriteLine("=== Đăng ký tài khoản ===");
