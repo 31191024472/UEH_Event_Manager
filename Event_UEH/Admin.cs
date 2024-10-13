@@ -397,15 +397,41 @@ namespace Event_UEH
                         string newDescription = Console.ReadLine();
                         Console.Write("Nhập địa điểm mới (để trống nếu không thay đổi): ");
                         string newLocation = Console.ReadLine();
+
                         Console.Write("Nhập ngày bắt đầu mới (dd/MM/yyyy) (để trống nếu không thay đổi): ");
                         string newStartDateInput = Console.ReadLine();
-                        DateTime newStartDate = string.IsNullOrEmpty(newStartDateInput) ? currentStartDate : DateTime.ParseExact(newStartDateInput, "dd/MM/yyyy", null);
+                        DateTime newStartDate;
+                        if (string.IsNullOrEmpty(newStartDateInput))
+                        {
+                            newStartDate = currentStartDate;
+                        }
+                        else
+                        {
+                            if (!DateTime.TryParseExact(newStartDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out newStartDate))
+                            {
+                                Console.WriteLine("Ngày bắt đầu không hợp lệ. Giữ nguyên giá trị cũ.");
+                                newStartDate = currentStartDate;
+                            }
+                        }
+
                         Console.Write("Nhập ngày kết thúc mới (dd/MM/yyyy) (để trống nếu không thay đổi): ");
                         string newEndDateInput = Console.ReadLine();
-                        DateTime newEndDate = string.IsNullOrEmpty(newEndDateInput) ? currentEndDate : DateTime.ParseExact(newEndDateInput, "dd/MM/yyyy", null);
+                        DateTime newEndDate;
+                        if (string.IsNullOrEmpty(newEndDateInput))
+                        {
+                            newEndDate = currentEndDate;
+                        }
+                        else
+                        {
+                            if (!DateTime.TryParseExact(newEndDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out newEndDate))
+                            {
+                                Console.WriteLine("Ngày kết thúc không hợp lệ. Giữ nguyên giá trị cũ.");
+                                newEndDate = currentEndDate;
+                            }
+                        }
 
                         // Câu lệnh SQL sửa sự kiện
-                        string updateQuery = "UPDATE Events SET Title = @title, Description = @description, Location = @location, StartDate = @startDate, EndDate = @endDate WHERE Id = @eventId OR Title = @title";
+                        string updateQuery = "UPDATE Events SET Title = @title, Description = @description, Location = @location, StartDate = @startDate, EndDate = @endDate WHERE Id = @eventId";
 
                         using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                         {
@@ -441,59 +467,114 @@ namespace Event_UEH
 
 
 
-
         private static void DeleteEvent()
         {
             Console.Clear();
             Console.WriteLine("=== Xóa sự kiện ===");
             Console.Write("Nhập ID sự kiện cần xóa: ");
-            int eventId = int.Parse(Console.ReadLine());
-
-            // Câu lệnh SQL xóa sự kiện
-            string query = "DELETE FROM Events WHERE Id = @eventId";
-
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            int eventId;
+            if (int.TryParse(Console.ReadLine(), out eventId))
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@eventId", eventId);
+                using (SqlConnection connection = DatabaseConnection.GetConnection())
+                {
+                    // Xóa các bản ghi liên quan trong bảng RegisteredEvents
+                    string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE EventId = @eventId";
+                    using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
+                    {
+                        deleteRegisteredEventsCommand.Parameters.AddWithValue("@eventId", eventId);
+                        deleteRegisteredEventsCommand.ExecuteNonQuery();
+                    }
 
-                int result = command.ExecuteNonQuery();
-                if (result > 0)
-                {
-                    Console.WriteLine("Xóa sự kiện thành công.");
+                    // Xóa sự kiện
+                    string deleteEventQuery = "DELETE FROM Events WHERE Id = @eventId";
+                    using (SqlCommand deleteEventCommand = new SqlCommand(deleteEventQuery, connection))
+                    {
+                        deleteEventCommand.Parameters.AddWithValue("@eventId", eventId);
+                        int result = deleteEventCommand.ExecuteNonQuery();
+                        if (result > 0)
+                        {
+                            Console.WriteLine("Xóa sự kiện thành công.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Xóa sự kiện thất bại. Có thể không tìm thấy sự kiện với ID đã nhập.");
+                        }
+                    }
                 }
-                else
-                {
-                    Console.WriteLine("Xóa sự kiện thất bại hoặc không tìm thấy sự kiện với ID đã nhập.");
-                }
+            }
+            else
+            {
+                Console.WriteLine("ID không hợp lệ. Vui lòng nhập lại.");
             }
 
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
             ManageEvents();
         }
+
 
         private static void DisplayEvents()
         {
             Console.Clear();
             Console.WriteLine("=== Danh sách sự kiện ===");
+            Console.WriteLine();
 
             string query = "SELECT * FROM Events";
+
+            // Mở kết nối tới cơ sở dữ liệu
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                if (connection.State != System.Data.ConnectionState.Open)
                 {
-                    Console.WriteLine($"ID: {reader["Id"]}, Tiêu đề: {reader["Title"]}, Ngày bắt đầu: {reader["StartDate"]}, Ngày kết thúc: {reader["EndDate"]}, Địa điểm: {reader["Location"]}");
+                    Console.WriteLine("Không thể kết nối tới cơ sở dữ liệu.");
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ManageEvents();
+                    return;
+                }
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                try
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        // Kiểm tra xem có sự kiện nào không
+                        if (!reader.HasRows)
+                        {
+                            Console.WriteLine("Không có sự kiện nào được tìm thấy.");
+                        }
+                        else
+                        {
+                            // Hiển thị tiêu đề bảng
+                            Console.WriteLine("{0,-5} {1,-30} {2,-20} {3,-20} {4,-30}", "ID", "Tiêu đề", "Ngày bắt đầu", "Ngày kết thúc", "Địa điểm");
+                            Console.WriteLine(new string('-', 125)); // Đường kẻ phân cách
+
+                            while (reader.Read())
+                            {
+                                // Hiển thị thông tin từng sự kiện
+                                Console.WriteLine("{0,-5} {1,-30} {2,-20} {3,-20} {4,-30}",
+                                    reader["Id"],
+                                    reader["Title"],
+                                    DateTime.Parse(reader["StartDate"].ToString()).ToString("dd/MM/yyyy HH:mm"),
+                                    DateTime.Parse(reader["EndDate"].ToString()).ToString("dd/MM/yyyy HH:mm"),
+                                    reader["Location"]);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Có lỗi xảy ra khi truy xuất sự kiện: {ex.Message}");
                 }
             }
 
+            Console.WriteLine(new string('-', 125)); // Đường kẻ phân cách
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
             ManageEvents();
         }
+
         private static void ViewReports()
         {
             Console.WriteLine("Thống kê báo cáo - Chức năng sẽ được thêm sau.");

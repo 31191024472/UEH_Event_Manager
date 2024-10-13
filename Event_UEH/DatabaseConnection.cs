@@ -7,7 +7,9 @@ namespace Event_UEH
     {
         // Chuỗi kết nối tới SQL Server
         private static string connectionString = "Data Source=LAPTOP-S3RORAI8;" +
-            "Initial Catalog=EventManagementDB;Integrated Security=True";
+    "Initial Catalog=EventManagementDB;" +
+    "Integrated Security=True;" +
+    "MultipleActiveResultSets=True;";
 
         // Phương thức để lấy SqlConnection
         public static SqlConnection GetConnection()

@@ -145,7 +145,7 @@ namespace Event_UEH
             string username = Console.ReadLine();
 
             Console.Write("Nhập mật khẩu: ");
-            string password = Console.ReadLine();
+            string password = ReadPassword();
 
             User user = AuthenticateUser(username, password);
             if (user != null)
@@ -164,7 +164,25 @@ namespace Event_UEH
                 Console.ReadKey();
             }
         }
+        // Hàm xử lý password sáng ký tự *
+        private static string ReadPassword()
+        {
+            string password = string.Empty;
+            ConsoleKeyInfo keyInfo;
 
+            do
+            {
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key != ConsoleKey.Enter)
+                {
+                    password += keyInfo.KeyChar;
+                    Console.Write("*"); // Hiển thị dấu * cho mật khẩu
+                }
+            } while (keyInfo.Key != ConsoleKey.Enter);
+
+            Console.WriteLine(); // Xuống dòng sau khi nhập mật khẩu
+            return password;
+        }
         // Phương thức để chuyển RoleId thành tên vai trò
         private static string GetRoleName(int roleId)
         {
