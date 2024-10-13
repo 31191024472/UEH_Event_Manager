@@ -1,0 +1,179 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\databasesetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\databasesetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\admin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\admin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\event.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\organizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\organizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\databaseconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\databaseconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|c:\\users\\matebook d15\\source\\repos\\event_ueh\\event_ueh\\trash.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B88BC7D-CD3F-44D8-953E-4D7A576A7197}|Event_UEH\\Event_UEH.csproj|solutionrelative:event_ueh\\trash.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 249,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 11,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Student.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Student.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Student.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Student.cs",
+              "RelativeToolTip": "Event_UEH\\Student.cs",
+              "ViewState": "AgIAAJ4AAAAAAAAAAADwv7YAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T10:32:44.557Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Organizer.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Organizer.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Organizer.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Organizer.cs",
+              "RelativeToolTip": "Event_UEH\\Organizer.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAEEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T10:32:24.924Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Admin.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Admin.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Admin.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Admin.cs",
+              "RelativeToolTip": "Event_UEH\\Admin.cs",
+              "ViewState": "AgIAACcBAAAAAAAAAADgvzgBAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-11T10:31:33.323Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "DatabaseConnection.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\DatabaseConnection.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\DatabaseConnection.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\DatabaseConnection.cs",
+              "RelativeToolTip": "Event_UEH\\DatabaseConnection.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAAAgwCYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-09T01:08:56.267Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DatabaseSetup.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\DatabaseSetup.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\DatabaseSetup.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\DatabaseSetup.cs",
+              "RelativeToolTip": "Event_UEH\\DatabaseSetup.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwBcAAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-09T01:06:45.838Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Trash.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Trash.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Trash.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Trash.cs",
+              "RelativeToolTip": "Event_UEH\\Trash.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACsAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-07T16:11:30.55Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\User.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\User.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\User.cs*",
+              "RelativeToolTip": "Event_UEH\\User.cs*",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAowA8AAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-07T16:25:12.066Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Event.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Event.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Event.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Event.cs",
+              "RelativeToolTip": "Event_UEH\\Event.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAADwvwsAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-07T16:12:22.764Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Program.cs",
+              "RelativeDocumentMoniker": "Event_UEH\\Program.cs",
+              "ToolTip": "C:\\Users\\Matebook D15\\source\\repos\\Event_UEH\\Event_UEH\\Program.cs",
+              "RelativeToolTip": "Event_UEH\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-07T16:04:18.337Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

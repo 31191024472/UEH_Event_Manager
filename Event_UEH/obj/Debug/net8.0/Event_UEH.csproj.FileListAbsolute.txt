@@ -20,3 +20,4 @@ C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\runtimes
 C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.csproj.AssemblyReference.cache
 C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.csproj.Up2Date
+c:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.sourcelink.json
