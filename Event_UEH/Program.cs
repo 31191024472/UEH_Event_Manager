@@ -33,7 +33,7 @@ namespace Event_UEH
                         User.Login(); // Gọi phương thức đăng nhập
                         break;
                     case "2":
-                        User.RegisterUser(); // Gọi phương thức đăng ký
+                        User.Register(); // Gọi phương thức đăng ký
                         break;
                     case "0":
                         Console.WriteLine("Tạm biệt!");

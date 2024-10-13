@@ -11,82 +11,67 @@ namespace Event_UEH
         public string Email { get; set; }
         public string FullName { get; set; }
         public int RoleId { get; set; }
+        public static class Session
+        {
+            public static int CurrentUserId { get; set; }
+        }
+
 
         // Đăng ký người dùng mới
-        public static void RegisterUser()
+        public static void Register()
         {
             Console.Clear();
             Console.WriteLine("=== Đăng ký tài khoản ===");
 
-            Console.Write("Nhập email: ");
-            string email = Console.ReadLine();
-
-            // Kiểm tra xem email đã tồn tại hay chưa
-            string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email"; // Giả sử bảng Users có cột Email
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            // Bước chọn loại tài khoản (Admin, Sinh viên, Tổ chức)
+            int roleId = 0;
+            while (true)
             {
-                SqlCommand checkCommand = new SqlCommand(checkQuery, connection);
-                checkCommand.Parameters.AddWithValue("@Email", email);
+                Console.WriteLine("Chọn loại tài khoản:");
+                Console.WriteLine("1. Admin");
+                Console.WriteLine("2. Sinh viên");
+                Console.WriteLine("3. Tổ chức");
+                Console.Write("Nhập lựa chọn (1, 2 hoặc 3): ");
+                string input = Console.ReadLine();
 
-                try
+                if (input == "1" || input == "2" || input == "3")
                 {
-                    connection.Open();
-                    int count = (int)checkCommand.ExecuteScalar();
-                    if (count > 0)
-                    {
-                        Console.WriteLine("Email này đã có người sở hữu. Vui lòng nhập email khác.");
-                        Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-                        Console.ReadKey();
-                        return; // Trở về mà không thực hiện đăng ký
-                    }
+                    roleId = int.Parse(input); // Lưu RoleId từ lựa chọn
+                    break;
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine($"Lỗi: {ex.Message}");
-                    return; // Trở về trong trường hợp lỗi
+                    Console.WriteLine("Lựa chọn không hợp lệ, vui lòng nhập lại.");
                 }
             }
 
-            // Nếu email chưa tồn tại, tiến hành nhập thêm thông tin khác
+            // Bước nhập thông tin người dùng
+            string email;
+            while (true)
+            {
+                Console.Write("Nhập địa chỉ Email: ");
+                email = Console.ReadLine();
+                if (!UserExists(email)) // Kiểm tra xem email đã tồn tại chưa
+                {
+                    break;
+                }
+                Console.WriteLine("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+            }
+
+            Console.Write("Nhập tên đăng nhập: ");
+            string username = Console.ReadLine();
+
             Console.Write("Nhập mật khẩu: ");
             string password = Console.ReadLine();
 
-            Console.Write("Nhập họ và tên: ");
+            Console.Write("Nhập họ tên: ");
             string fullName = Console.ReadLine();
 
-            // Câu lệnh SQL để chèn tài khoản mới
-            string insertQuery = "INSERT INTO Users (Email, Password, FullName) VALUES (@Email, @Password, @FullName)";
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
-            {
-                SqlCommand insertCommand = new SqlCommand(insertQuery, connection);
-                insertCommand.Parameters.AddWithValue("@Email", email);
-                insertCommand.Parameters.AddWithValue("@Password", password); // Mật khẩu nên được mã hóa
-                insertCommand.Parameters.AddWithValue("@FullName", fullName);
-
-                try
-                {
-                    connection.Open();
-                    int result = insertCommand.ExecuteNonQuery();
-                    if (result > 0)
-                    {
-                        Console.WriteLine("Đăng ký tài khoản thành công!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Đăng ký tài khoản thất bại.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Lỗi: {ex.Message}");
-                }
-            }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+            // Lưu người dùng vào cơ sở dữ liệu với RoleId tương ứng
+            SaveUserToDatabase(username, password, email, fullName, roleId);
+            Console.WriteLine("Đăng ký thành công! Nhấn phím bất kỳ để tiếp tục...");
             Console.ReadKey();
         }
-
-
         // Kiểm tra người dùng có tồn tại trong cơ sở dữ liệu không
         private static bool UserExists(string email)
         {
@@ -166,6 +151,9 @@ namespace Event_UEH
             if (user != null)
             {
                 Console.WriteLine($"Đăng nhập thành công! Chào {user.FullName}!");
+
+                // Lưu UserId của người dùng vào biến toàn cục
+                Session.CurrentUserId = user.Id; 
 
                 // Gọi hàm để hiển thị giao diện tương ứng với vai trò
                 ShowDashboard(GetRoleName(user.RoleId));

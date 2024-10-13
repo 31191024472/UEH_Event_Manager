@@ -16,7 +16,7 @@ namespace Event_UEH
             try
             {
                 connection.Open();
-                Console.WriteLine("Kết nối tới SQL Server thành công.");
+                //Console.WriteLine("Kết nối tới SQL Server thành công.");
             }
             catch (Exception ex)
             {
