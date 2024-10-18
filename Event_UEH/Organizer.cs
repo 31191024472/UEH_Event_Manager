@@ -17,6 +17,9 @@ namespace Event_UEH
             Console.WriteLine("4. Xem các sự kiện đã tổ chức");
             Console.WriteLine("5. Xem các sự kiện đã xóa");
             Console.WriteLine("6. Đăng xuất");
+            Console.WriteLine("7. Xem danh sách các sinh viên đã đăng ký");
+            Console.WriteLine("8. Xem thời tiết");
+
             Console.Write("Nhập lựa chọn: ");
             string choice = Console.ReadLine();
 
@@ -39,6 +42,12 @@ namespace Event_UEH
                     break;
                 case "6":
                     Console.WriteLine("Đăng xuất thành công!");
+                    break;
+                case "7":
+                    ShowRegisteredStudents(Session.CurrentUserId);
+                    break;
+                case "8":
+                    Student.Weather();
                     break;
                 default:
                     Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
@@ -167,8 +176,6 @@ namespace Event_UEH
 
             // Xóa sự kiện và lưu thông tin vào bảng Trash
             MoveEventToTrash(eventId);
-
-            Console.WriteLine("Xóa sự kiện thành công!");
             Console.ReadKey();
             ShowDashboard();
         }
@@ -177,6 +184,19 @@ namespace Event_UEH
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
+                // Kiểm tra xem sự kiện có người đăng ký không
+                string checkRegistrationQuery = "SELECT COUNT(*) FROM RegisteredEvents WHERE EventId = @EventId";
+                SqlCommand checkCommand = new SqlCommand(checkRegistrationQuery, connection);
+                checkCommand.Parameters.AddWithValue("@EventId", eventId);
+                int registrationCount = (int)checkCommand.ExecuteScalar();
+
+                // Nếu sự kiện đã có người đăng ký, không xóa mà thông báo
+                if (registrationCount > 0)
+                {
+                    Console.WriteLine("Không thể xóa sự kiện vì đã có người đăng ký.");
+                    return; // Ngừng quá trình nếu sự kiện có người đăng ký
+                }
+
                 // Thêm sự kiện vào bảng Trash
                 string insertQuery = "INSERT INTO Trash (EventId, UserId) VALUES (@EventId, @UserId)";
                 SqlCommand insertCommand = new SqlCommand(insertQuery, connection);
@@ -191,8 +211,11 @@ namespace Event_UEH
                 deleteCommand.Parameters.AddWithValue("@EventId", eventId);
 
                 deleteCommand.ExecuteNonQuery();
+
+                Console.WriteLine("Sự kiện đã được di chuyển vào thùng rác.");
             }
         }
+
 
         // Xem các sự kiện đã tổ chức
         private static void ViewOrganizedEvents()
@@ -241,5 +264,52 @@ namespace Event_UEH
             Console.ReadKey();
             ShowDashboard();
         }
+        private static void ShowRegisteredStudents(int organizerId)
+        {
+            Console.Clear();
+            Console.WriteLine("=== Danh sách sinh viên đã đăng ký các sự kiện của bạn ===\n");
+
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                string query = @"SELECT RE.UserId, RE.RegistrationDate, RE.Status, RE.Notes, E.Title, E.Description, E.Id AS EventId
+                         FROM RegisteredEvents RE
+                         INNER JOIN Events E ON RE.EventId = E.Id
+                         WHERE E.OrganizerId = @OrganizerId
+                         ORDER BY E.Id";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@OrganizerId", organizerId);
+
+                SqlDataReader reader = command.ExecuteReader();
+                int? currentEventId = null;  // Theo dõi sự kiện hiện tại để nhóm danh sách sinh viên
+                while (reader.Read())
+                {
+                    int eventId = (int)reader["EventId"];
+
+                    // Nếu sự kiện thay đổi, hiển thị tiêu đề sự kiện mới
+                    if (currentEventId == null || currentEventId != eventId)
+                    {
+                        currentEventId = eventId;
+                        Console.WriteLine("\n-------------------------------------");
+                        Console.WriteLine($"Sự kiện: {reader["Title"]}");
+                        Console.WriteLine($"Mô tả: {reader["Description"]}\n");
+                    }
+
+                    // Hiển thị thông tin sinh viên đăng ký sự kiện hiện tại
+                    Console.WriteLine($"Sinh viên ID: {reader["UserId"]}, Ngày đăng ký: {reader["RegistrationDate"]}, Trạng thái: {reader["Status"]}, Ghi chú: {reader["Notes"]}");
+                }
+
+                if (!reader.HasRows)
+                {
+                    Console.WriteLine("Không có sinh viên nào đã đăng ký các sự kiện của bạn.");
+                }
+            }
+
+            Console.WriteLine("\nNhấn phím bất kỳ để quay lại...");
+            Console.ReadKey();
+            ShowDashboard();
+        }
+
+
     }
 }

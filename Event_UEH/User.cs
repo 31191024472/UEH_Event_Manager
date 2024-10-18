@@ -223,9 +223,5 @@ namespace Event_UEH
             }
         }
 
-
-
-        // Lưu người dùng vào cơ sở dữ liệu
-
     }
 }

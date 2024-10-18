@@ -21,3 +21,10 @@ C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\runtimes
 C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.csproj.AssemblyReference.cache
 C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.csproj.Up2Date
 c:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\obj\Debug\net8.0\Event_UEH.sourcelink.json
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.Asio.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.Core.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.Midi.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.Wasapi.dll
+C:\Users\Matebook D15\source\repos\Event_UEH\Event_UEH\bin\Debug\net8.0\NAudio.WinMM.dll

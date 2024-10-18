@@ -22,7 +22,7 @@ namespace Event_UEH
 
             while (true)
             {
-                Console.Clear(); // Xóa màn hình trước khi hiển thị menu
+                Console.Clear();
                 DisplayHeader(); // Gọi phương thức hiển thị tiêu đề
 
                 // Hiển thị các tùy chọn menu
@@ -76,9 +76,9 @@ namespace Event_UEH
             Console.ForegroundColor = ConsoleColor.Cyan; // Màu chữ
 
             // Hiển thị tiêu đề với khung viền
-            Console.WriteLine("=============================================");
-            Console.WriteLine("           Phần mềm quản lý sự kiện       ");
-            Console.WriteLine("=============================================");
+            Console.WriteLine("==========================================================================================");
+            Console.WriteLine("\r\n  _    _ ______ _    _   ______               _     __  __                                   \r\n | |  | |  ____| |  | | |  ____|             | |   |  \\/  |                                  \r\n | |  | | |__  | |__| | | |____   _____ _ __ | |_  | \\  / | __ _ _ __   __ _  __ _  ___ _ __ \r\n | |  | |  __| |  __  | |  __\\ \\ / / _ \\ '_ \\| __| | |\\/| |/ _` | '_ \\ / _` |/ _` |/ _ \\ '__|\r\n | |__| | |____| |  | | | |___\\ V /  __/ | | | |_  | |  | | (_| | | | | (_| | (_| |  __/ |   \r\n  \\____/|______|_|  |_| |______\\_/ \\___|_| |_|\\__| |_|  |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_|   \r\n                                                                              __/ |          \r\n                                                                             |___/           \r\n");
+            Console.WriteLine("==========================================================================================");
 
             Console.ResetColor(); // Khôi phục lại màu sắc mặc định
         }

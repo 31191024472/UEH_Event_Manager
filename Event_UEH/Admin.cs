@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Media;
 
 namespace Event_UEH
 {
@@ -7,13 +8,30 @@ namespace Event_UEH
     {
         public static void ShowDashboard()
         {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Cyan; // Chọn màu chữ là Cyan
             Console.Clear();
+
+            // Hiển thị chữ "UEH" bằng ký tự ASCII
+            string ueh = @"
+  _    _ ______ _    _ 
+ | |  | |  ____| |  | |
+ | |  | | |__  | |__| |
+ | |  | |  __| |  __  |
+ | |__| | |____| |  | |
+  \____/|______|_|  |_|               
+        ";
+
+            Console.WriteLine(ueh);
+            Console.WriteLine(new string('=', 60)); // Dòng phân cách
+
             Console.WriteLine("=== Giao diện Admin ===");
             Console.WriteLine("Chức năng:");
             Console.WriteLine("1. Quản lý người dùng");
             Console.WriteLine("2. Quản lý sự kiện");
             Console.WriteLine("3. Thống kê báo cáo");
             Console.WriteLine("4. Đăng xuất");
+            Console.WriteLine(new string('=', 60)); // Dòng phân cách
             Console.Write("Nhập lựa chọn: ");
             string choice = Console.ReadLine();
 
@@ -26,7 +44,7 @@ namespace Event_UEH
                     ManageEvents();
                     break;
                 case "3":
-                    ViewReports();
+                    GenerateReport();
                     break;
                 case "4":
                     Console.WriteLine("Đăng xuất thành công!");
@@ -38,6 +56,7 @@ namespace Event_UEH
                     break;
             }
         }
+
 
         private static void ManageUsers()
         {
@@ -582,5 +601,96 @@ namespace Event_UEH
             Console.ReadKey();
             ShowDashboard();
         }
+        public static void GenerateReport()
+        {
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                if (connection != null)
+                {
+                    int totalEvents = GetTotalEvents(connection);
+                    int ongoingEvents = GetOngoingEvents(connection);
+                    int finishedEvents = GetFinishedEvents(connection);
+                    int totalRegistrations = GetTotalRegistrations(connection);
+                    double averageRating = GetAverageRating(connection);
+
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("==== BÁO CÁO THỐNG KÊ ====");
+                    Console.ResetColor();
+
+                    Console.WriteLine($"Tổng số sự kiện: {FormatNumber(totalEvents)}");
+                    Console.WriteLine($"Sự kiện đang diễn ra: {FormatNumber(ongoingEvents)}");
+                    Console.WriteLine($"Sự kiện đã kết thúc: {FormatNumber(finishedEvents)}");
+                    Console.WriteLine($"Tổng số người đăng ký: {FormatNumber(totalRegistrations)}");
+                    Console.WriteLine($"Đánh giá trung bình: {averageRating:F2}");
+
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ShowDashboard();
+                }
+            }
+        }
+    
+
+        private static string FormatNumber(int number)
+        {
+            return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
+        }
+        public static int GetTotalEvents(SqlConnection connection)
+        {
+            string query = "SELECT COUNT(*) FROM Events";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                return (int)command.ExecuteScalar();
+            }
+        }
+
+        // Phương thức để lấy số sự kiện đang diễn ra
+        public static int GetOngoingEvents(SqlConnection connection)
+        {
+            string query = "SELECT COUNT(*) FROM RegisteredEvents WHERE Status = 'Đã đăng ký'";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                return (int)command.ExecuteScalar();
+            }
+        }
+
+        // Phương thức để lấy số sự kiện đã kết thúc
+        public static int GetFinishedEvents(SqlConnection connection)
+        {
+            // Truy vấn đếm số lượng sự kiện đã bị xóa trong bảng Trash
+            string query = "SELECT COUNT(*) FROM Trash";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                object result = command.ExecuteScalar();
+
+                // Kiểm tra nếu kết quả là null hoặc không có giá trị thì trả về 0, ngược lại trả về số lượng
+                return result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+
+
+        // Phương thức để lấy tổng số người đăng ký
+        public static int GetTotalRegistrations(SqlConnection connection)
+        {
+            string query = "SELECT COUNT(*) FROM RegisteredEvents";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                return (int)command.ExecuteScalar();
+            }
+        }
+
+        // Phương thức để lấy đánh giá trung bình
+        public static double GetAverageRating(SqlConnection connection)
+        {
+            string query = "SELECT AVG(CAST(Rating AS FLOAT)) FROM Rate WHERE Rating IS NOT NULL";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                object result = command.ExecuteScalar();
+                return result != DBNull.Value && result != null ? Convert.ToDouble(result) : 0.0;
+            }
+        }
+
     }
 }

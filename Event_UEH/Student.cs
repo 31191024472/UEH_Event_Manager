@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Data.SqlClient;
 using static Event_UEH.User;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
-namespace Event_UEH
+
+namespace Event_UEH 
 {
     public class Student
     {
@@ -19,7 +23,8 @@ namespace Event_UEH
             Console.WriteLine("5. Tìm kiếm sự kiện");
             Console.WriteLine("6. Hiển thị toàn bộ sự kiện");
             Console.WriteLine("7. Chơi game giải trí");
-            Console.WriteLine("8. Đăng xuất");
+            Console.WriteLine("8. Xem thời tiết");
+            Console.WriteLine("9. Đăng xuất");
             Console.Write("Nhập lựa chọn: ");
             string choice = Console.ReadLine();
 
@@ -54,6 +59,9 @@ namespace Event_UEH
                     ShowDashboard();
                     break;
                 case "8":
+                    Weather();
+                    break;
+                case "9":
                     Console.WriteLine("Đăng xuất thành công!");
                     break;
                 default:
@@ -451,7 +459,75 @@ namespace Event_UEH
         }
 
 
+        public static void Weather()
+        {
+            string apiKey = "be3294eb40ddf30921e33ae77653c6f8"; // Thay bằng API Key của bạn
 
+            var client = new HttpClient();
+
+            // Danh sách các thành phố và tọa độ
+            var cities = new Dictionary<string, (string, double, double)>()
+            {
+                { "Ho Chi Minh City", ("Ho Chi Minh City", 10.8231, 106.6297) },
+                { "Ha Noi", ("Ha Noi", 21.0285, 105.8542) },
+                { "Lam Dong", ("Lam Dong", 11.5753, 108.1429) },
+                { "Da Nang", ("Da Nang", 16.0471, 108.2068) }
+            };
+
+            Console.WriteLine("Bạn muốn xem thời tiết của thành phố nào (Ho Chi Minh City, Ha Noi, Lam Dong, Da Nang)?");
+            var city_name = Console.ReadLine();
+
+            // Chuyển tên thành phố nhập vào thành dạng chữ thường và tìm khớp
+            city_name = city_name.Trim().ToLower();
+
+            foreach (var city in cities.Keys)
+            {
+                if (city.ToLower() == city_name)
+                {
+                    var (cityDisplayName, lat, lon) = cities[city];
+
+                    // URL API kèm tọa độ thành phố và API Key
+                    var weatherURL = $"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+
+                    var weatherResponse = client.GetAsync(weatherURL).Result;
+
+                    if (weatherResponse.IsSuccessStatusCode)
+                    {
+                        var formatResponseMain = JObject.Parse(weatherResponse.Content.ReadAsStringAsync().Result);
+
+                        // Nhiệt độ
+                        var temp = formatResponseMain["main"]["temp"];
+                        // Độ ẩm
+                        var humidity = formatResponseMain["main"]["humidity"];
+                        // Áp suất
+                        var pressure = formatResponseMain["main"]["pressure"];
+                        // Tốc độ gió
+                        var windSpeed = formatResponseMain["wind"]["speed"];
+                        // Mô tả thời tiết
+                        var description = formatResponseMain["weather"][0]["description"];
+
+                        // Hiển thị các thông tin thời tiết
+                        Console.WriteLine($"Thời tiết hiện tại ở {cityDisplayName}:");
+                        Console.WriteLine($"- Nhiệt độ: {temp}°C");
+                        Console.WriteLine($"- Độ ẩm: {humidity}%");
+                        Console.WriteLine($"- Áp suất: {pressure} hPa");
+                        Console.WriteLine($"- Tốc độ gió: {windSpeed} m/s");
+                        Console.WriteLine($"- Mô tả: {description}");
+                    }
+                    else
+                    {
+                        var errorResponse = weatherResponse.Content.ReadAsStringAsync().Result;
+                        Console.WriteLine("Không thể lấy thông tin thời tiết. Lỗi phản hồi API: " + errorResponse);
+                    }
+
+                    break;
+                }
+            }
+
+            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+            Console.ReadKey();
+            ShowDashboard(); // Giả sử đây là hàm quay lại giao diện chính
+        }
 
     }
 }
