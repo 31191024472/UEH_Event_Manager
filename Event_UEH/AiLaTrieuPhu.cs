@@ -7,157 +7,257 @@ namespace Event_UEH
         static int[] giaThuong = { 500000, 1000000, 2000000, 3000000, 5000000, 10000000, 14000000, 22000000, 30000000, 50000000, 100000000, 200000000, 400000000, 800000000, 1000000000 };
         static int[] mocQuanTrong = { 5, 10, 15 };
         static string[] cauHoi = {
-                "Thủ đô của Việt Nam là gì?",
-                "Động vật nào được gọi là 'Vua của rừng xanh'?",
-                "Ai đã viết vở kịch nổi tiếng 'Romeo và Juliet'?",
-                "Hành tinh nào lớn nhất trong hệ mặt trời?",
-                "Loài chim nào không biết bay?",
-                "Chất nào cấu tạo nên phần lớn cơ thể con người?",
-                "Biển nào lớn nhất thế giới?",
-                "Nhà văn nào viết tiểu thuyết 'Chiến tranh và hòa bình'?",
-                "Nước nào là nước đông dân nhất thế giới?",
-                "Tác giả của bản 'Tuyên ngôn Độc lập' Hoa Kỳ là ai?",
-                "Núi nào cao nhất thế giới?",
-                "Tác phẩm 'Thần khúc' là của tác giả nào?",
-                "Quốc gia nào có diện tích lớn nhất thế giới?",
-                "Khoa học nào nghiên cứu về vũ trụ?",
-                "Loài động vật nào có vú nhưng đẻ trứng?",
-                "Bộ phim nào đoạt giải Oscar cho Phim hay nhất năm 1994?",
-                "Cây cầu nào nổi tiếng ở San Francisco?",
-                "Tác giả của tác phẩm 'Don Quixote' là ai?",
-                "Loại nhạc cụ nào mà Ludwig van Beethoven chơi?",
-                "Bộ xương người có bao nhiêu chiếc xương?",
-                "Ai là nhà khoa học đã phát hiện ra penicillin?",
-                "Đơn vị đo lường điện trở là gì?",
-                "Nhà thơ nổi tiếng Nguyễn Du là tác giả của tác phẩm nào?",
-                "Ai là người sáng lập hãng Microsoft?",
-                "Châu lục nào nhỏ nhất trên thế giới?",
-                "Sông nào dài nhất thế giới?",
-                "Quốc gia nào tổ chức World Cup 2018?",
-                "Quốc kỳ của nước nào có hình chiếc lá phong?",
-                "Ngọn núi nào cao nhất ở Nhật Bản?",
-                "Hành tinh nào gần Mặt Trời nhất?",
-                "Ai là nhà khoa học đề xuất thuyết tương đối?",
-                "Loại kim loại nào nhẹ nhất?",
-                "Quốc gia nào có dân số lớn thứ 2 thế giới?",
-                "Bộ phim nào đoạt giải Oscar cho Phim hay nhất năm 1997?",
-                "Quốc gia nào sản xuất nhiều cà phê nhất thế giới?",
-                "Quốc gia nào được gọi là Đất nước của Kim tự tháp?",
-                "Sông nào chảy qua thành phố London?",
-                "Quốc gia nào có diện tích nhỏ nhất trên thế giới?",
-                "Ai là họa sĩ nổi tiếng người Tây Ban Nha?",
-                "Ai là tổng thống thứ 16 của Hoa Kỳ?",
-                "Quốc gia nào có hình thức chính phủ quân chủ lập hiến?",
-                "Bộ môn nào là phần thi trong Olympic Mùa đông?",
-                "Ai là nữ hoàng nước Anh vào thế kỷ 19?",
-                "Quốc gia nào nổi tiếng với ngành công nghiệp thời trang ở Milan?",
-                "Ai đã phát minh ra bóng đèn điện?",
-                "Quốc gia nào nổi tiếng với món sushi?",
-                "Quốc gia nào có hệ thống đường sắt dài nhất thế giới?",
-                "Ngọn núi cao nhất ở châu Âu là gì?",
-                "Ai đã viết bản giao hưởng thứ 9?"
+            "Bạn có thể đăng ký cấp lại thẻ sinh viên; phúc khảo các học phần; xác nhận tạm hoãn nghĩa vụ quân sự; xác nhận vay vốn sinh viên; xác nhận sinh viên; cấp bảng điểm Tiếng Việt/Tiếng Anh; bảng điểm rèn luyện; bản sao văn bằng; nộp hồ sơ tuyển sinh; Gia tăng",
+"Ai có thể tham gia các chương trình tại English Zone",
+
+"Bạn có thể liên hệ với thư viện viên bằng cách",
+
+"Bạn có thể Tra cứu Thời khóa biểu, Hình thức giảng dạy, Lịch thi, Giảng đường tại đâu",
+
+"Bạn tự kiểm tra đạo văn bằng ứng dụng trực tuyến tại đường dẫn",
+
+"Bên cạnh đội ngũ tư vấn tận tâm, DSA còn",
+
+"Các kênh thông tin để bạn có thể liên hệ với Phòng Chăm sóc và hỗ trợ người học khi gặp vấn đề cần hỗ trợ",
+
+"Các hoạt động tại English Zone do phòng/ban nào tổ chức",
+
+"Các loại chứng chỉ tiếng Anh quốc tế được áp dụng Miễn học phần tiếng Anh tổng quát theo quy định hiện hành, gồm",
+
+"Các mặt đánh giá kết quả rèn luyện bao gồm",
+
+"Các nguồn hỗ trợ tài chính gồm có",
+
+"Các tổ chức chính trị, chính trị - xã hội tại UEH là",
+
+"Căn cứ xét học bổng khuyến khích học tập",
+
+"Chủ thể tiếp nhận và thực hiện UEH thành trường đại học định hướng nghiên cứu gồm",
+
+"Chuẩn trình độ ngoại ngữ đầu ra là giống nhau giữa các chương trình chuẩn, chương trình tiếng Anh bán phần, chương trình tiếng Anh toàn phần",
+
+"CLB/Đội/Nhóm nào sau đây là CLB/Đội/Nhóm trực thuộc Đoàn Hội cấp trường",
+
+"Có bao kênh tư vấn tại DSA",
+
+"Có bao nhiêu mức học bổng hỗ trợ học tập",
+
+"Có bao nhiêu mức học bổng khuyến khích học tập",
+
+"Có bao nhiêu tiện ích trên Cổng thông tin việc làm",
+
+"Để nhận thông tin kịp thời từ DSA, người học cần phải",
+
+"Để sử dụng thành thạo các tiện ích của DSA, bạn cần",
+
+"Địa chỉ các cơ sở của UEH nằm ở đâu",
+
+"Địa chỉ của DSA là",
+
+"Địa chỉ Văn phòng DSA",
+
+"Đoàn Thanh niên có nhiệm vụ gì",
+
+"Đoàn viên thanh niên có thể tham gia các hoạt động nào",
+
+"Giờ làm việc của DSA",
+
+"Hỗ trợ người học qua kênh nào",
+
+"Những hoạt động nào nằm trong kế hoạch rèn luyện của sinh viên",
+
+"Nội dung nào là chính của chương trình tư vấn của DSA",
+
+"Quy trình xin học bổng hỗ trợ học tập gồm những bước nào",
+
+"Sinh viên có thể nhận học bổng từ đâu",
+
+"Thời gian đăng ký học bổng là khi nào",
+
+"Thời gian tổ chức các hoạt động văn nghệ thường diễn ra vào lúc nào",
+
+"Trung tâm hỗ trợ người học của UEH được thành lập với mục đích gì",
+
+"Vị trí của các cơ sở của UEH nằm ở đâu",
+
+"Yêu cầu đối với sinh viên khi tham gia các hoạt động tình nguyện là gì",
+
+"Bạn có thể tìm thông tin về học bổng tại đâu",
+
+"Các câu lạc bộ sinh viên tại UEH thường hoạt động vào thời gian nào",
+
+"Những hoạt động nào thường được tổ chức bởi Đoàn Thanh niên",
+
+"Sinh viên có thể tham gia các khóa học kỹ năng mềm ở đâu",
+
+"Chương trình giao lưu sinh viên quốc tế diễn ra vào thời gian nào",
+
+"Những hoạt động nào là điểm nhấn trong các sự kiện của trường",
+
+"Sinh viên có thể tham gia tư vấn nghề nghiệp ở đâu",
+
+"Thời gian tổ chức các sự kiện lớn trong năm học thường là khi nào",
+
+"Các chương trình học bổng của UEH thường được công bố ở đâu",
+
+"Sinh viên có thể nhận được sự hỗ trợ nào từ DSA",
+
+"Để tham gia vào các hoạt động của Đoàn Thanh niên, sinh viên cần đáp ứng yêu cầu gì",
+
             };
         static char[] dapAnDung = {
-                'A', // Thủ đô của Việt Nam là gì?
-                'C', // Động vật nào được gọi là 'Vua của rừng xanh'?
-                'B', // Ai đã viết vở kịch nổi tiếng 'Romeo và Juliet'?
-                'C', // Hành tinh nào lớn nhất trong hệ mặt trời?
-                'B', // Loài chim nào không biết bay?
-                'B', // Chất nào cấu tạo nên phần lớn cơ thể con người?
-                'D', // Biển nào lớn nhất thế giới?
-                'A', // Nhà văn nào viết tiểu thuyết 'Chiến tranh và hòa bình'?
-                'C', // Nước nào là nước đông dân nhất thế giới?
-                'B', // Tác giả của bản 'Tuyên ngôn Độc lập' Hoa Kỳ là ai?
-                'A', // Núi nào cao nhất thế giới?
-                'A', // Tác phẩm 'Thần khúc' là của tác giả nào?
-                'B', // Quốc gia nào có diện tích lớn nhất thế giới?
-                'C', // Khoa học nào nghiên cứu về vũ trụ?
-                'D', // Loài động vật nào có vú nhưng đẻ trứng?
-                'A', // Bộ phim nào đoạt giải Oscar cho Phim hay nhất năm 1994?
-                'A', // Cây cầu nào nổi tiếng ở San Francisco?
-                'C', // Tác giả của tác phẩm 'Don Quixote' là ai?
-                'A', // Loại nhạc cụ nào mà Ludwig van Beethoven chơi?
-                'B', // Bộ xương người có bao nhiêu chiếc xương?
-                'B', // Ai là nhà khoa học đã phát hiện ra penicillin?
-                'A', // Đơn vị đo lường điện trở là gì?
-                'A', // Nhà thơ nổi tiếng Nguyễn Du là tác giả của tác phẩm nào?
-                'B', // Ai là người sáng lập hãng Microsoft?
-                'D', // Châu lục nào nhỏ nhất trên thế giới?
-                'A', // Sông nào dài nhất thế giới?
-                'A', // Quốc gia nào tổ chức World Cup 2018?
-                'A', // Quốc kỳ của nước nào có hình chiếc lá phong?
-                'A', // Ngọn núi nào cao nhất ở Nhật Bản?
-                'C', // Hành tinh nào gần Mặt Trời nhất?
-                'C', // Ai là nhà khoa học đề xuất thuyết tương đối?
-                'C', // Loại kim loại nào nhẹ nhất?
-                'B', // Quốc gia nào có dân số lớn thứ 2 thế giới?
-                'A', // Bộ phim nào đoạt giải Oscar cho Phim hay nhất năm 1997?
-                'B', // Quốc gia nào sản xuất nhiều cà phê nhất thế giới?
-                'A', // Quốc gia nào được gọi là Đất nước của Kim tự tháp?
-                'B', // Sông nào chảy qua thành phố London?
-                'A', // Quốc gia nào có diện tích nhỏ nhất trên thế giới?
-                'B', // Ai là họa sĩ nổi tiếng người Tây Ban Nha?
-                'C', // Ai là tổng thống thứ 16 của Hoa Kỳ?
-                'B', // Quốc gia nào có hình thức chính phủ quân chủ lập hiến?
-                'A', // Bộ môn nào là phần thi trong Olympic Mùa đông?
-                'A', // Ai là nữ hoàng nước Anh vào thế kỷ 19?
-                'B', // Quốc gia nào nổi tiếng với ngành công nghiệp thời trang ở Milan?
-                'A', // Ai đã phát minh ra bóng đèn điện?
-                'B', // Quốc gia nào nổi tiếng với món sushi?
-                'B', // Quốc gia nào có hệ thống đường sắt dài nhất thế giới?
-                'A', // Ngọn núi cao nhất ở châu Âu là gì?
-                'B'  // Ai đã viết bản giao hưởng thứ 9?
+'A',
+'B',
+'C',
+'B',
+'C',
+'A',
+'A',
+'C',
+'B',
+'A',
+'A',
+'A',
+'A',
+'B',
+'A',
+'A',
+'A',
+'A',
+'D',
+'A',
+'B',
+'D',
+'A',
+'A',
+'A',
+'A',
+'D',
+'D',
+'A',
+'A',
+'A',
+'C',
+'D',
+'C',
+'A',
+'D',
+'D',
+'A',
+'A',
+'A',
+'C',
+'A',
+'A',
+'A',
+'C',
+'D',
+'A',
+'D',
+'A',
+'A',
             };
         static string[,] luaChon = {
-                { "A. Hà Nội", "B. TP. Hồ Chí Minh", "C. Đà Nẵng", "D. Huế" },
-                { "A. Voi", "B. Hổ", "C. Sư tử", "D. Báo" },
-                { "A. Lev Tolstoy", "B. William Shakespeare", "C. Mark Twain", "D. Charles Dickens" },
-                { "A. Trái Đất", "B. Sao Hỏa", "C. Sao Mộc", "D. Sao Kim" },
-                { "A. Đại bàng", "B. Đà điểu", "C. Chim cắt", "D. Cú" },
-                { "A. Protein", "B. Nước", "C. Canxi", "D. Oxy" },
-                { "A. Biển Đông", "B. Biển Đỏ", "C. Biển Caribe", "D. Thái Bình Dương" },
-                { "A. Lev Tolstoy", "B. Victor Hugo", "C. Ernest Hemingway", "D. Fyodor Dostoevsky" },
-                { "A. Hoa Kỳ", "B. Ấn Độ", "C. Trung Quốc", "D. Indonesia" },
-                { "A. Benjamin Franklin", "B. Thomas Jefferson", "C. George Washington", "D. Abraham Lincoln" },
-                { "A. Everest", "B. Kilimanjaro", "C. Phú Sĩ", "D. K2" },
-                { "A. Dante Alighieri", "B. Homer", "C. Virgil", "D. John Milton" },
-                { "A. Hoa Kỳ", "B. Nga", "C. Trung Quốc", "D. Canada" },
-                { "A. Địa lý học", "B. Sinh học", "C. Thiên văn học", "D. Khí tượng học" },
-                { "A. Thỏ", "B. Dơi", "C. Chuột chũi", "D. Thú mỏ vịt" },
-                { "A. Forrest Gump", "B. Titanic", "C. Braveheart", "D. Pulp Fiction" },
-                { "A. Golden Gate", "B. Brooklyn", "C. London", "D. Harbour" },
-                { "A. William Shakespeare", "B. Dante Alighieri", "C. Miguel de Cervantes", "D. Charles Dickens" },
-                { "A. Piano", "B. Violin", "C. Sáo", "D. Ghi-ta" },
-                { "A. 205", "B. 206", "C. 207", "D. 208" },
-                { "A. Albert Einstein", "B. Alexander Fleming", "C. Louis Pasteur", "D. Isaac Newton" },
-                { "A. Ohm", "B. Volt", "C. Watt", "D. Joule" },
-                { "A. Truyện Kiều", "B. Lục Vân Tiên", "C. Chí Phèo", "D. Số đỏ" },
-                { "A. Steve Jobs", "B. Bill Gates", "C. Mark Zuckerberg", "D. Elon Musk" },
-                { "A. Châu Á", "B. Châu Âu", "C. Châu Phi", "D. Châu Úc" },
-                { "A. Sông Nile", "B. Sông Amazon", "C. Sông Mississippi", "D. Sông Dương Tử" },
-                { "A. Nga", "B. Brazil", "C. Hoa Kỳ", "D. Qatar" },
-                { "A. Canada", "B. Úc", "C. Nhật Bản", "D. Anh" },
-                { "A. Núi Phú Sĩ", "B. Núi Everest", "C. Núi Kilimanjaro", "D. Núi Elbrus" },
-                { "A. Sao Kim", "B. Sao Hỏa", "C. Sao Thủy", "D. Sao Mộc" },
-                { "A. Isaac Newton", "B. Nikola Tesla", "C. Albert Einstein", "D. Stephen Hawking" },
-                { "A. Sắt", "B. Vàng", "C. Nhôm", "D. Thủy ngân" },
-                { "A. Hoa Kỳ", "B. Ấn Độ", "C. Brazil", "D. Indonesia" },
-                { "A. Titanic", "B. Braveheart", "C. Gladiator", "D. Avatar" },
-                { "A. Việt Nam", "B. Brazil", "C. Colombia", "D. Ethiopia" },
-                { "A. Ai Cập", "B. Peru", "C. Mexico", "D. Trung Quốc" },
-                { "A. Sông Seine", "B. Sông Thames", "C. Sông Volga", "D. Sông Danube" },
-                { "A. Vatican", "B. Monaco", "C. Liechtenstein", "D. Luxembourg" },
-                { "A. Salvador Dali", "B. Pablo Picasso", "C. Francisco Goya", "D. Joan Miro" },
-                { "A. George Washington", "B. Franklin Roosevelt", "C. Abraham Lincoln", "D. John Adams" },
-                { "A. Nhật Bản", "B. Thụy Điển", "C. Anh", "D. Úc" },
-                { "A. Trượt tuyết", "B. Trượt ván", "C. Trượt băng", "D. Khúc côn cầu" },
-                { "A. Nữ hoàng Victoria", "B. Nữ hoàng Elizabeth I", "C. Nữ hoàng Mary", "D. Nữ hoàng Anne" },
-                { "A. Pháp", "B. Ý", "C. Tây Ban Nha", "D. Đức" },
-                { "A. Thomas Edison", "B. Nikola Tesla", "C. Alexander Bell", "D. Albert Einstein" },
-                { "A. Trung Quốc", "B. Nhật Bản", "C. Thái Lan", "D. Việt Nam" },
-                { "A. Hoa Kỳ", "B. Nga", "C. Ấn Độ", "D. Canada" },
-                { "A. Mont Blanc", "B. Everest", "C. Phú Sĩ", "D. Kilimanjaro" },
-                { "A. Wolfgang Amadeus Mozart", "B. Ludwig van Beethoven", "C. Franz Schubert", "D. Johann Sebastian Bach" }
+               { "A. Trang sinh viên: http://student.ueh.edu.vn/", "B. Cổng Giao dịch điện tử UEH (UEH online service): https://es.ueh.edu.vn", "C. Website Phòng Chăm sóc và hỗ trợ người học: https://dsa.ueh.edu.vn", "D. Trực tiếp tại các đơn vị có liên quan" },
+
+{ "A. Sinh viên quốc tế", "B. Tất cả đều đúng", "C. Viên chức", "D. Sinh viên ĐHCQ" },
+
+{ "A. Liên hệ số điện thoại (028) 3856.1249 - Ext.102", "B. Gửi email đến askusnow@ueh.edu.vn", "C. Tất cả các kênh đã nêu", "D. Sử dụng dịch vụ live chat Ask-us-now" },
+
+{ "A. Cả [*] [**] đều đúng", "B. Website Phòng Đào tạo", "C. Tài khoản sinh viên: http://student.ueh.edu.vn", "D. Website Phòng Kế hoạch đào tạo - Khảo thí" },
+
+{ "A. plagiarismcheckerx.com", "B. plagiarismdetector.net", "C. kiemtradaovan.ueh.edu.vn", "D. copyscape.com" },
+
+{ "A. liên kết với các Bộ phận công tác Đoàn thanh niên - Hội sinh viên người học nhằm hỗ trợ bao quát mọi vấn đề đời sống sinh viên.", "B. liên kết với các chuyên gia là tư vấn viên tại các đơn vị chức năng, khoa, viện, nhằm hỗ trợ người học về các vấn đề và nhu cầu chuyên sâu trong từng lĩnh vực cụ thể.", "C. liên kết với Trạm Y tế nhằm hỗ trợ sức khỏe thể chất và tinh thần cho đời sống sinh viên.", "D. liên kết với các chuyên gia tại địa phương người học nhằm hỗ trợ người học về các vấn đề và nhu cầu chuyên sâu trong từng lĩnh vực cụ thể." },
+
+{ "A. Hotline (028) 7306 1976; email: dsa@ueh.edu.vn; fanpage UEH [@DHKT.UEH]; Fanpage DSA [@DSA.UEH]", "B. Hotline (028) 3829 5299; email: dsa@ueh.edu.vn; Fanpage DSA [@DSA.UEH]", "C. Hotline (028) 7306 1976; email: dsa@ueh.edu.vn", "D. Hotline (028) 3829 5299; email: dsa@ueh.edu.vn; fanpage UEH [@DHKT.UEH]; Fanpage DSA [@DSA.UEH]" },
+
+{ "A. Cả [] và [] đều sai", "B. Cả [] và [] đều đúng", "C. Người học bị trừ 30% điểm học phần (tỷ lệ trừ do Giảng viên thông báo từ đầu môn học)", "D. Người học phải viết lại, chỉnh sửa lại bài" },
+
+{ "A. Phòng Marketing – Truyền thông", "B. DSA", "C. Văn phòng trường", "D. Phòng Đào tạo" },
+
+{ "A. TOEIC; IELTS; TOEFL IBT; PTE", "B. IELTS; TOEFL; VPET", "C. TOEIC; TOEFL; VPET", "D. TOEIC; IELTS; TOEFL" },
+
+{ "A. Tất cả các mặt đã nêu", "B. Đánh giá về ý thức học tập; Đánh giá về ý thức và kết quả chấp hành nội quy, quy chế nhà trường;", "C. Đánh giá về ý thức và kết quả tham gia các hoạt động chính trị – xã hội, văn hoá, văn nghệ, thể thao, phòng chống tệ nạn xã hội; Đánh giá về phẩm chất công dân và quan hệ với cộng đồng;", "D. Đánh giá về ý thức và kết quả tham gia phụ trách lớp, các đoàn thể, tổ chức trong nhà trường hoặc đạt được thành tích đặc biệt trong học tập, rèn luyện của sinh viên;" },
+
+{ "A. Tất cả đều đúng", "B. Chương trình tín dụng học tập", "C. Vay vốn Ngân hàng Chính sách xã hội", "D. Chương trình học bổng Hỗ trợ học tập" },
+
+{ "A. Tất cả các tổ chức đã nêu", "B. Đảng bộ", "C. Đoàn Thanh niên", "D. Hội Sinh viên" },
+
+{ "A. Điểm trung bình học tập tích lũy và điểm rèn luyện của học kỳ trước học kỳ xét.", "B. Điểm trung bình học tập và điểm rèn luyện toàn khóa học tích lũy đến thời điểm xét", "C. Điểm trung bình học tập tích lũy của học kỳ trước và điểm rèn luyện toàn khóa học tích lũy đến thời điểm xét", "D. Điểm trung bình tích lũy, điểm rèn luyện của học kỳ trước, hoàn cảnh gia đình khó khăn" },
+
+{ "A. Tất cả các đáp án đã nêu", "B. Nghiên cứu sinh, Học viên cao học", "C. Sinh viên chính quy", "D. Giảng viên UEH" },
+
+{ "A. Đúng", "B. Sai", "C. Chỉ có quy định chuẩn đầu ra tiếng Anh đối với chương trình tiếng Anh toàn phần", "D. Không có quy định về chuẩn đầu ra tiếng Anh" },
+
+{ "A. CLB Tiếng Anh - Bell club", "B. CLB Bất động sản", "C. Nhóm sinh viên nghiên cứu thuế", "D. CLB Nhân sự khởi nghiệp" },
+
+{ "A. 4 (Trực tiếp tại văn phòng của DSA; Trực tuyến qua nền tảng MS. Teams; Hotline: 028.7306.1976 và Livestream, talkshow phát sóng trên trang fanpage DSA)", "B. 2 (Trực tiếp tại văn phòng của DSA; Online qua nền tảng MS. Teams)", "C. 3 (Trực tiếp tại văn phòng của DSA; Online qua nền tảng MS. Teams; Hotline: 028.7306.1976)", "D. 1 (Trực tiếp tại văn phòng của DSA)" },
+
+{ "A. 2 mức: Xuất sắc, Giỏi", "B. 2 mức: Giỏi, Khá", "C. 2 mức: Toàn phần, bán phần", "D. Tất cả đều sai" },
+
+{ "A. 3 mức: Xuất sắc, Giỏi, Khá", "B. 2 mức: Giỏi, Khá", "C. 3 mức: Xuất sắc, Toàn phần, bán phần", "D. Tất cả đều sai" },
+
+{ "A. 6", "B. 5", "C. 8", "D. 10" },
+
+{ "A. Tham gia vào Fanpage DSA", "B. Tham gia vào trang mạng xã hội DSA", "C. Tham gia vào cộng đồng người học UEH", "D. Tất cả đều đúng" },
+
+{ "A. Đăng ký tài khoản trên hệ thống", "B. Đăng ký tài khoản trên website", "C. Đăng ký tài khoản trên trang mạng xã hội", "D. Đăng ký tài khoản trên Cổng thông tin việc làm" },
+
+{ "A. Cả 2 trường đã nêu", "B. Đường Nguyễn Đình Chiểu, Quận 3", "C. Đường Hoàng Diệu, Quận 4", "D. Đường Hoàng Văn Thụ, Quận Tân Bình" },
+
+{ "A. Cơ sở 1: 279 Nguyễn Tri Phương, Quận 10, TP.HCM", "B. Cơ sở 2: 32 Nguyễn Văn Linh, Quận 7, TP.HCM", "C. Cơ sở 3: 15 Đường số 3, P. 9, Quận 8, TP.HCM", "D. Cơ sở 4: 76 Hoàng Diệu, Quận 4, TP.HCM" },
+
+{ "A. 279 Nguyễn Tri Phương, P.5, Q.10, TP.HCM", "B. 32 Nguyễn Văn Linh, Q.7, TP.HCM", "C. 15 Đường số 3, P. 9, Q.8, TP.HCM", "D. 76 Hoàng Diệu, Q.4, TP.HCM" },
+
+{ "A. Tổ chức các hoạt động văn hóa, thể thao", "B. Tham gia vào các hoạt động tình nguyện", "C. Cả hai đều đúng", "D. Tham gia các hoạt động nghiên cứu khoa học" },
+
+{ "A. Hoạt động tình nguyện", "B. Hoạt động ngoại khóa", "C. Hoạt động văn nghệ", "D. Tất cả đều sai" },
+
+{ "A. Hoạt động tình nguyện", "B. Hoạt động ngoại khóa", "C. Cả hai đều đúng", "D. Tất cả đều sai" },
+
+{ "A. Sinh viên tham gia các cuộc thi quốc gia và quốc tế", "B. Sinh viên tham gia các hoạt động văn hóa - xã hội", "C. Sinh viên tham gia các hoạt động thể thao", "D. Tất cả đều sai" },
+
+{ "A. Đúng", "B. Sai", "C. Không có quy định xếp hạng tốt nghiệp", "D. Chỉ có loại xuất sắc bị giảm"},
+
+{ "A. Sinh viên có thể đăng ký tham gia các hoạt động xã hội ngoài giờ học", "B. Sinh viên phải tham gia các hoạt động này theo quy định của nhà trường", "C. Sinh viên có thể tham gia vào các hoạt động này một cách tự nguyện", "D. Sinh viên không được tham gia các hoạt động ngoài giờ học" },
+
+{ "A. Tổ chức các hoạt động văn hóa thể thao", "B. Tổ chức các hoạt động tình nguyện", "C. Tổ chức các hoạt động nghiên cứu khoa học", "D. Tất cả đều đúng" },
+
+{ "A. Tham gia các hoạt động phong trào", "B. Tham gia các hoạt động tình nguyện", "C. Tham gia các hoạt động văn hóa nghệ thuật", "D. Tất cả đều sai" },
+
+{ "A. Cung cấp dịch vụ thông tin và hỗ trợ người học", "B. Tư vấn tâm lý cho sinh viên", "C. Tổ chức các hoạt động ngoại khóa", "D. Tất cả đều đúng" },
+
+{ "A. Không phải là sinh viên", "B. Có thể là sinh viên hoặc đã tốt nghiệp", "C. Chỉ là sinh viên", "D. Không rõ" },
+
+{ "A. Tham gia các hội thảo, hội nghị", "B. Tổ chức các buổi tọa đàm", "C. Cả hai đều đúng", "D. Không tổ chức bất kỳ hoạt động nào" },
+
+{ "A. 8%", "B. 10%", "C. 12%", "D. 15%" },
+
+{ "A. 3/4", "B. 1/2", "C. 1/4", "D. 2/3" },
+
+{ "A. 8%", "B. 10%", "C. 12%", "D. 15%" },
+
+{ "A. Tham gia vào các hoạt động tình nguyện", "B. Tham gia vào các hoạt động văn hóa - xã hội", "C. Cả hai đều đúng", "D. Không tham gia hoạt động nào" },
+
+{ "A. Đúng", "B. Sai", "C. Không có quy định xếp hạng tốt nghiệp", "D. Chỉ có loại xuất sắc bị giảm"},
+
+{ "A. Tham gia các cuộc thi", "B. Tham gia vào các hoạt động tình nguyện", "C. Không tham gia bất kỳ hoạt động nào", "D. Tất cả đều sai" },
+
+{ "A. Tham gia các hoạt động nghiên cứu khoa học", "B. Tổ chức các hoạt động ngoại khóa", "C. Cả hai đều đúng", "D. Không tham gia hoạt động nào" },
+
+{ "A. Không có thông tin", "B. Có thông tin về các hoạt động", "C. Có thông tin về các dịch vụ", "D. Không rõ" },
+
+{ "A. Tổ chức các hoạt động ngoại khóa", "B. Cung cấp dịch vụ hỗ trợ sinh viên", "C. Tư vấn cho sinh viên", "D. Tất cả đều đúng" },
+
+{ "A. 3%", "B. 5%", "C. 10%", "D. 15%" },
+
+{ "A. Đúng", "B. Sai", "C. Không rõ", "D. Tất cả đều sai" },
+
+{ "A. 8%", "B. 10%", "C. 12%", "D. 15%" },
+
+{ "A. Không có thông tin", "B. Có thông tin về các hoạt động", "C. Có thông tin về các dịch vụ", "D. Không rõ" }
+
             };
         public static void ChoiTroChoi()
         {
@@ -333,3 +433,4 @@ namespace Event_UEH
         }
     }
 }
+

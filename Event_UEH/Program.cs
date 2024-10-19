@@ -15,7 +15,63 @@ namespace Event_UEH
             MainMenu(); // Gọi phương thức menu chính
         }
 
-        static void MainMenu()
+        // Chức năng hiển thị thanh Header UEH 
+        static void DisplayHeader()
+        {
+            // Thiết lập màu sắc cho tiêu đề
+            Console.ForegroundColor = ConsoleColor.Cyan; // Màu chữ
+            int windowWidth = Console.WindowWidth;
+
+            // Tiêu đề với khung viền
+            string titleBorder = new string('=', windowWidth);
+            string titleText = @"
+  _    _ ______ _    _   ______               _     __  __                                   
+ | |  | |  ____| |  | | |  ____|             | |   |  \/  |                                  
+ | |  | | |__  | |__| | | |____   _____ _ __ | |_  | \  / | __ _ _ __   __ _  __ _  ___ _ __  
+ | |  | |  __| |  __  | |  __\ \ / / _ \ '_ \| __| | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__| 
+ | |__| | |____| |  | | | |___\ V /  __/ | | | |_  | |  | | (_| | | | | (_| | (_| |  __/ |    
+  \____/|______|_|  |_| |______\_/ \___|_| |_|\__| |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|    
+                                                                            __/ |           
+                                                                           |___/            
+";
+
+            // Căn giữa các phần tử
+            Console.WriteLine(titleBorder);
+            CenterText(titleText);
+            Console.WriteLine(titleBorder);
+
+            Console.ResetColor(); // Khôi phục lại màu sắc mặc định
+        }
+
+        // Phương thức căn giữa chiều dọc và chiều ngang 
+        public static void CenterText(string text)
+        {
+            int windowWidth = Console.WindowWidth;
+            int windowHeight = Console.WindowHeight;
+            string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            // Tính số dòng trống cần thiết để căn giữa theo chiều dọc
+            int emptyLines = (windowHeight - lines.Length) / 2;
+
+            // Thêm các dòng trống để căn giữa theo chiều dọc
+            for (int i = 0; i < emptyLines; i++)
+            {
+                Console.WriteLine();
+            }
+
+            // Căn giữa theo chiều ngang từng dòng
+            foreach (string line in lines)
+            {
+                int padding = (windowWidth - line.Length) / 2;
+                if (padding > 0)
+                    Console.WriteLine(new string(' ', padding) + line);
+                else
+                    Console.WriteLine(line); // Nếu dòng quá dài, in ra mà không căn giữa
+            }
+        }
+
+        // C
+        public static void MainMenu()
         {
             string[] menuOptions = { "1. Đăng nhập", "2. Đăng ký tài khoản mới", "0. Thoát chương trình" };
             int currentSelection = 0; // Chỉ số tùy chọn hiện tại
@@ -28,15 +84,16 @@ namespace Event_UEH
                 // Hiển thị các tùy chọn menu
                 for (int i = 0; i < menuOptions.Length; i++)
                 {
+                    int padding = (Console.WindowWidth - menuOptions[i].Length) / 2;
                     if (i == currentSelection) // Đánh dấu tùy chọn hiện tại
                     {
                         Console.ForegroundColor = ConsoleColor.Green; // Màu cho tùy chọn được chọn
-                        Console.WriteLine($"> {menuOptions[i]} <"); // Hiển thị tùy chọn được chọn
+                        Console.WriteLine(new string(' ', padding) + $"> {menuOptions[i]} <"); // Hiển thị tùy chọn được chọn
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.White; // Màu chữ bình thường
-                        Console.WriteLine(menuOptions[i]); // Hiển thị tùy chọn bình thường
+                        Console.WriteLine(new string(' ', padding) + menuOptions[i]); // Hiển thị tùy chọn bình thường
                     }
                 }
                 Console.ResetColor(); // Khôi phục lại màu sắc mặc định
@@ -70,17 +127,5 @@ namespace Event_UEH
             }
         }
 
-        static void DisplayHeader()
-        {
-            // Thiết lập màu sắc cho tiêu đề
-            Console.ForegroundColor = ConsoleColor.Cyan; // Màu chữ
-
-            // Hiển thị tiêu đề với khung viền
-            Console.WriteLine("==========================================================================================");
-            Console.WriteLine("\r\n  _    _ ______ _    _   ______               _     __  __                                   \r\n | |  | |  ____| |  | | |  ____|             | |   |  \\/  |                                  \r\n | |  | | |__  | |__| | | |____   _____ _ __ | |_  | \\  / | __ _ _ __   __ _  __ _  ___ _ __ \r\n | |  | |  __| |  __  | |  __\\ \\ / / _ \\ '_ \\| __| | |\\/| |/ _` | '_ \\ / _` |/ _` |/ _ \\ '__|\r\n | |__| | |____| |  | | | |___\\ V /  __/ | | | |_  | |  | | (_| | | | | (_| | (_| |  __/ |   \r\n  \\____/|______|_|  |_| |______\\_/ \\___|_| |_|\\__| |_|  |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_|   \r\n                                                                              __/ |          \r\n                                                                             |___/           \r\n");
-            Console.WriteLine("==========================================================================================");
-
-            Console.ResetColor(); // Khôi phục lại màu sắc mặc định
-        }
     }
 }

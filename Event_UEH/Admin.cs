@@ -1,54 +1,95 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Media;
+using static Event_UEH.User;
 
 namespace Event_UEH
 {
     public class Admin
     {
+
+        // Giao diện của tài khoản Admin
+        private static string[] adminOptions = new[]
+        {
+    "👤 Quản lý người dùng",
+    "📅 Quản lý sự kiện",
+    "📊 Thống kê báo cáo",
+    "🚪 Đăng xuất"
+};
+
+        private static int currentAdminSelection = 0; // Chỉ số lựa chọn hiện tại cho admin
+
         public static void ShowDashboard()
         {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Cyan; // Chọn màu chữ là Cyan
-            Console.Clear();
-
-            // Hiển thị chữ "UEH" bằng ký tự ASCII
-            string ueh = @"
-  _    _ ______ _    _ 
- | |  | |  ____| |  | |
- | |  | | |__  | |__| |
- | |  | |  __| |  __  |
- | |__| | |____| |  | |
-  \____/|______|_|  |_|               
-        ";
-
-            Console.WriteLine(ueh);
-            Console.WriteLine(new string('=', 60)); // Dòng phân cách
-
-            Console.WriteLine("=== Giao diện Admin ===");
-            Console.WriteLine("Chức năng:");
-            Console.WriteLine("1. Quản lý người dùng");
-            Console.WriteLine("2. Quản lý sự kiện");
-            Console.WriteLine("3. Thống kê báo cáo");
-            Console.WriteLine("4. Đăng xuất");
-            Console.WriteLine(new string('=', 60)); // Dòng phân cách
-            Console.Write("Nhập lựa chọn: ");
-            string choice = Console.ReadLine();
-
-            switch (choice)
+            while (true) // Vòng lặp để giữ cho giao diện hiển thị cho đến khi người dùng chọn đăng xuất
             {
-                case "1":
+                Console.Clear();
+
+                // Hiển thị chữ "UEH" bằng ký tự ASCII
+                string ueh = @"
+ _    _ ______ _    _ 
+| |  | |  ____| |  | |
+| |  | | |__  | |__| |
+| |  | |  __| |  __  |
+| |__| | |____| |  | |
+ \____/|______|_|  |_|               
+       ";
+                Console.WriteLine(ueh);
+                Console.WriteLine(new string('=', 60)); // Dòng phân cách
+
+                Console.WriteLine("=== Giao diện Admin ===");
+                Console.WriteLine("Chức năng:");
+                for (int i = 0; i < adminOptions.Length; i++)
+                {
+                    if (i == currentAdminSelection)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan; // Đổi màu lựa chọn hiện tại
+                        Console.WriteLine($"> {adminOptions[i]} <"); // Hiển thị lựa chọn hiện tại với dấu mũi tên
+                        Console.ResetColor(); // Khôi phục màu sắc
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {adminOptions[i]}");
+                    }
+                }
+                Console.WriteLine(new string('=', 60)); // Dòng phân cách
+
+                // Kiểm tra phím được nhấn
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    currentAdminSelection = (currentAdminSelection > 0) ? currentAdminSelection - 1 : adminOptions.Length - 1; // Di chuyển lên
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    currentAdminSelection = (currentAdminSelection < adminOptions.Length - 1) ? currentAdminSelection + 1 : 0; // Di chuyển xuống
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    ExecuteAdminSelection(currentAdminSelection); // Thực hiện lựa chọn hiện tại
+                }
+            }
+        }
+
+        private static void ExecuteAdminSelection(int selection)
+        {
+            switch (selection)
+            {
+                case 0:
                     ManageUsers();
                     break;
-                case "2":
-                    ManageEvents();
+                case 1:
+                    QuanLySuKien();
                     break;
-                case "3":
+                case 2:
                     GenerateReport();
-                    break;
-                case "4":
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    break; // Quay lại vòng lặp chính
+                case 3:
                     Console.WriteLine("Đăng xuất thành công!");
-                    break;
+                    Program.MainMenu(); // Gọi hàm quay lại menu chính
+                    return;
                 default:
                     Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
@@ -57,36 +98,74 @@ namespace Event_UEH
             }
         }
 
+        // Chức năng quản lý người dùng
+        private static string[] userManagementOptions = new[]
+        {
+    "📋 Hiển thị danh sách người dùng",
+    "➕ Thêm người dùng mới",
+    "🗑️ Xóa người dùng",
+    "✏️ Chỉnh sửa người dùng",
+    "🔙 Quay lại"
+};
+
+        private static int currentUserSelection = 0; // Chỉ số lựa chọn hiện tại cho quản lý người dùng
 
         private static void ManageUsers()
         {
-            Console.Clear();
-            Console.WriteLine("=== Quản lý người dùng ===");
-            Console.WriteLine("1. Hiển thị danh sách người dùng");
-            Console.WriteLine("2. Thêm người dùng mới");
-            Console.WriteLine("3. Xóa người dùng");
-            Console.WriteLine("4. Chỉnh sửa người dùng");
-            Console.WriteLine("5. Quay lại");
-            Console.Write("Nhập lựa chọn: ");
-            string choice = Console.ReadLine();
-
-            switch (choice)
+            while (true) // Vòng lặp để giữ cho giao diện hiển thị cho đến khi người dùng chọn quay lại
             {
-                case "1":
-                    DisplayUsers();
+                Console.Clear();
+                Console.WriteLine("=== Quản lý người dùng ===");
+
+                for (int i = 0; i < userManagementOptions.Length; i++)
+                {
+                    if (i == currentUserSelection)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan; // Đổi màu lựa chọn hiện tại
+                        Console.WriteLine($"> {userManagementOptions[i]} <"); // Hiển thị lựa chọn hiện tại với dấu mũi tên
+                        Console.ResetColor(); // Khôi phục màu sắc
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {userManagementOptions[i]}");
+                    }
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    currentUserSelection = (currentUserSelection > 0) ? currentUserSelection - 1 : userManagementOptions.Length - 1; // Di chuyển lên
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    currentUserSelection = (currentUserSelection < userManagementOptions.Length - 1) ? currentUserSelection + 1 : 0; // Di chuyển xuống
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    ExecuteUserSelection(currentUserSelection); // Thực hiện lựa chọn hiện tại
+                }
+            }
+        }
+
+        private static void ExecuteUserSelection(int selection)
+        {
+            switch (selection)
+            {
+                case 0:
+                    HienThiNguoiDUng();
                     break;
-                case "2":
-                    AddUser();
+                case 1:
+                    ThemNguoiDung();
                     break;
-                case "3":
-                    DeleteUser();
+                case 2:
+                    XoaNguoiDung();
                     break;
-                case "4":
-                    EditUser();
+                case 3:
+                    ChinhSuaNguoiDung();
                     break;
-                case "5":
-                    ShowDashboard();
-                    break;
+                case 4:
+                    ShowDashboard(); // Quay lại dashboard
+                    return;
                 default:
                     Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
@@ -95,7 +174,86 @@ namespace Event_UEH
             }
         }
 
-        private static void DisplayUsers()
+        // Chức năng quản lý sự kiện
+        private static string[] eventManagementOptions = new[]
+        {
+    "➕ Thêm sự kiện",
+    "✏️ Sửa sự kiện",
+    "🗑️ Xóa sự kiện",
+    "📋 Hiển thị danh sách sự kiện",
+    "🔙 Quay lại"
+};
+
+        private static int currentEventSelection = 0; // Chỉ số lựa chọn hiện tại cho quản lý sự kiện
+
+        // Chức năng quản lý sự kiện
+        private static void QuanLySuKien()
+        {
+            while (true) // Vòng lặp để giữ cho giao diện hiển thị cho đến khi người dùng chọn quay lại
+            {
+                Console.Clear();
+                Console.WriteLine("=== Quản lý sự kiện ===");
+
+                for (int i = 0; i < eventManagementOptions.Length; i++)
+                {
+                    if (i == currentEventSelection)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan; // Đổi màu lựa chọn hiện tại
+                        Console.WriteLine($"> {eventManagementOptions[i]} <"); // Hiển thị lựa chọn hiện tại với dấu mũi tên
+                        Console.ResetColor(); // Khôi phục màu sắc
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {eventManagementOptions[i]}");
+                    }
+                }
+
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    currentEventSelection = (currentEventSelection > 0) ? currentEventSelection - 1 : eventManagementOptions.Length - 1; // Di chuyển lên
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    currentEventSelection = (currentEventSelection < eventManagementOptions.Length - 1) ? currentEventSelection + 1 : 0; // Di chuyển xuống
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    ExecuteEventSelection(currentEventSelection); // Thực hiện lựa chọn hiện tại
+                }
+            }
+        }
+
+        // Danh sách các sự lựa chọn của chức năng quản lý sự kiện
+        private static void ExecuteEventSelection(int selection)
+        {
+            switch (selection)
+            {
+                case 0:
+                    ThemSuKien();
+                    break;
+                case 1:
+                    ChinhSuaSuKien();
+                    break;
+                case 2:
+                    XoaSuKien();
+                    break;
+                case 3:
+                    HienThiAllSuKien();
+                    break;
+                case 4:
+                    ShowDashboard(); // Quay lại dashboard
+                    return;
+                default:
+                    Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    QuanLySuKien();
+                    break;
+            }
+        }
+
+        // Chức năng hiển thị người dùng
+        private static void HienThiNguoiDUng()
         {
             Console.Clear();
             Console.WriteLine("=== Danh sách người dùng ===");
@@ -118,7 +276,9 @@ namespace Event_UEH
             Console.ReadKey();
             ManageUsers();
         }
-        private static void AddUser()
+
+        // Chức năng thêm người dùng mới
+        private static void ThemNguoiDung()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm người dùng mới ===");
@@ -166,14 +326,28 @@ namespace Event_UEH
             ManageUsers();
         }
 
-
-        private static void DeleteUser()
+        // Chức năng xóa người dùng
+        private static void XoaNguoiDung()
         {
             Console.Clear();
             Console.WriteLine("=== Xóa người dùng ===");
 
-            Console.Write("Nhập ID người dùng muốn xóa: ");
-            int userId = int.Parse(Console.ReadLine());
+            // Kiểm tra nhập ID người dùng là số
+            int userId;
+            while (true)
+            {
+                Console.Write("Nhập ID người dùng muốn xóa: ");
+                string userInput = Console.ReadLine();
+
+                if (int.TryParse(userInput, out userId)) // Kiểm tra nếu người dùng nhập đúng số
+                {
+                    break; // Nếu đúng, thoát vòng lặp
+                }
+                else
+                {
+                    Console.WriteLine("ID người dùng không hợp lệ. Vui lòng nhập lại (chỉ nhập số).");
+                }
+            }
 
             string query = "DELETE FROM Users WHERE Id = @userId";
 
@@ -197,13 +371,46 @@ namespace Event_UEH
             Console.ReadKey();
             ManageUsers();
         }
-        private static void EditUser()
+
+
+        // Chức năng chỉnh sửa thông tin người dùng
+        private static void ChinhSuaNguoiDung()
         {
             Console.Clear();
             Console.WriteLine("=== Chỉnh sửa người dùng ===");
 
-            Console.Write("Nhập ID người dùng muốn chỉnh sửa: ");
-            int userId = int.Parse(Console.ReadLine());
+            // Kiểm tra nhập ID người dùng là số và kiểm tra sự tồn tại trong cơ sở dữ liệu
+            int userId;
+            while (true)
+            {
+                Console.Write("Nhập ID người dùng muốn chỉnh sửa: ");
+                string userInput = Console.ReadLine();
+
+                if (int.TryParse(userInput, out userId)) // Kiểm tra nếu người dùng nhập đúng số
+                {
+                    // Kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu không
+                    using (SqlConnection connection = DatabaseConnection.GetConnection())
+                    {
+                        string checkQuery = "SELECT COUNT(*) FROM Users WHERE Id = @userId";
+                        SqlCommand checkCommand = new SqlCommand(checkQuery, connection);
+                        checkCommand.Parameters.AddWithValue("@userId", userId);
+
+                        int userExists = (int)checkCommand.ExecuteScalar();
+                        if (userExists > 0)
+                        {
+                            break; // Nếu người dùng tồn tại, thoát vòng lặp
+                        }
+                        else
+                        {
+                            Console.WriteLine("Không tìm thấy người dùng với ID này. Vui lòng nhập lại.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ID người dùng không hợp lệ. Vui lòng nhập lại (chỉ nhập số).");
+                }
+            }
 
             Console.Write("Nhập tên người dùng mới (để trống nếu không thay đổi): ");
             string newUsername = Console.ReadLine();
@@ -211,10 +418,34 @@ namespace Event_UEH
             Console.Write("Nhập mật khẩu mới (để trống nếu không thay đổi): ");
             string newPassword = Console.ReadLine();  // Mã hóa mật khẩu nếu cần
 
-            Console.Write("Nhập vai trò mới (1 = Admin, 2 = Tổ chức, 3 = Sinh viên) (để trống nếu không thay đổi): ");
-            string newRoleIdInput = Console.ReadLine();
-            int newRoleId = string.IsNullOrEmpty(newRoleIdInput) ? -1 : int.Parse(newRoleIdInput);
+            Console.Write("Nhập Email mới (để trống nếu không thay đổi): ");
+            string newEmail = Console.ReadLine();
 
+            Console.Write("Nhập họ và tên mới (để trống nếu không thay đổi): ");
+            string newFullName = Console.ReadLine();
+
+            // Kiểm tra nhập vai trò là số
+            int newRoleId = -1;  // Giá trị mặc định nếu không thay đổi vai trò
+            while (true)
+            {
+                Console.Write("Nhập vai trò mới (1 = Admin, 2 = Tổ chức, 3 = Sinh viên) (để trống nếu không thay đổi): ");
+                string newRoleIdInput = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(newRoleIdInput)) // Nếu không nhập thì không thay đổi
+                {
+                    break;
+                }
+                else if (int.TryParse(newRoleIdInput, out newRoleId) && (newRoleId >= 1 && newRoleId <= 3)) // Kiểm tra vai trò hợp lệ
+                {
+                    break; // Nếu hợp lệ, thoát vòng lặp
+                }
+                else
+                {
+                    Console.WriteLine("Vai trò không hợp lệ. Vui lòng nhập 1, 2 hoặc 3.");
+                }
+            }
+
+            // Xây dựng câu truy vấn cập nhật
             string query = "UPDATE Users SET ";
             bool hasUpdate = false;
 
@@ -230,6 +461,18 @@ namespace Event_UEH
                 hasUpdate = true;
             }
 
+            if (!string.IsNullOrEmpty(newEmail))
+            {
+                query += (hasUpdate ? ", " : "") + "Email = @Email ";
+                hasUpdate = true;
+            }
+
+            if (!string.IsNullOrEmpty(newFullName))
+            {
+                query += (hasUpdate ? ", " : "") + "FullName = @FullName ";
+                hasUpdate = true;
+            }
+
             if (newRoleId != -1)
             {
                 query += (hasUpdate ? ", " : "") + "RoleId = @roleId ";
@@ -238,6 +481,7 @@ namespace Event_UEH
 
             query += "WHERE Id = @userId";
 
+            // Thực hiện câu lệnh cập nhật nếu có thay đổi
             if (hasUpdate)
             {
                 using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -246,6 +490,8 @@ namespace Event_UEH
                     command.Parameters.AddWithValue("@userId", userId);
                     if (!string.IsNullOrEmpty(newUsername)) command.Parameters.AddWithValue("@username", newUsername);
                     if (!string.IsNullOrEmpty(newPassword)) command.Parameters.AddWithValue("@password", newPassword);  // Mã hóa nếu cần
+                    if (!string.IsNullOrEmpty(newEmail)) command.Parameters.AddWithValue("@Email", newEmail);
+                    if (!string.IsNullOrEmpty(newFullName)) command.Parameters.AddWithValue("@FullName", newFullName);
                     if (newRoleId != -1) command.Parameters.AddWithValue("@roleId", newRoleId);
 
                     int result = command.ExecuteNonQuery();
@@ -270,43 +516,9 @@ namespace Event_UEH
         }
 
 
-        private static void ManageEvents()
-        {
-            Console.Clear();
-            Console.WriteLine("=== Quản lý sự kiện ===");
-            Console.WriteLine("1. Thêm sự kiện");
-            Console.WriteLine("2. Sửa sự kiện");
-            Console.WriteLine("3. Xóa sự kiện");
-            Console.WriteLine("4. Hiển thị danh sách sự kiện");
-            Console.WriteLine("5. Quay lại");
-            Console.Write("Nhập lựa chọn: ");
-            string choice = Console.ReadLine();
 
-            switch (choice)
-            {
-                case "1":
-                    AddEvent();
-                    break;
-                case "2":
-                    EditEvent();
-                    break;
-                case "3":
-                    DeleteEvent();
-                    break;
-                case "4":
-                    DisplayEvents();
-                    break;
-                case "5":
-                    ShowDashboard();
-                    break;
-                default:
-                    Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
-                    Console.ReadKey();
-                    ManageEvents();
-                    break;
-            }
-        }
-        private static void AddEvent()
+        // CHức năng thêm mới sự kiện
+        private static void ThemSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm sự kiện mới ===");
@@ -326,11 +538,9 @@ namespace Event_UEH
             Console.Write("Nhập ngày kết thúc (dd/MM/yyyy): ");
             DateTime endDate = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", null);
 
-            Console.Write("Nhập ID người tạo sự kiện: ");
-            int createdBy = int.Parse(Console.ReadLine());
-
-            Console.Write("Nhập ID tổ chức (người tổ chức): ");
-            int organizerId = int.Parse(Console.ReadLine());
+            // Lấy ID người tạo từ session
+            int createdBy = Session.CurrentUserId; // ID của tài khoản admin đã đăng nhập
+            int organizerId = Session.CurrentUserId; // Lấy luôn ID của admin cho tổ chức
 
             // Câu lệnh SQL thêm sự kiện
             string query = "INSERT INTO Events (Title, Description, Location, StartDate, EndDate, CreatedBy, OrganizerId) VALUES (@title, @description, @location, @startDate, @endDate, @createdBy, @organizerId)";
@@ -343,8 +553,8 @@ namespace Event_UEH
                 command.Parameters.AddWithValue("@location", location);
                 command.Parameters.AddWithValue("@startDate", startDate);
                 command.Parameters.AddWithValue("@endDate", endDate);
-                command.Parameters.AddWithValue("@createdBy", createdBy);
-                command.Parameters.AddWithValue("@organizerId", organizerId);
+                command.Parameters.AddWithValue("@createdBy", createdBy); // Sử dụng ID của người tạo từ session
+                command.Parameters.AddWithValue("@organizerId", organizerId); // Sử dụng ID của admin cho tổ chức
 
                 int result = command.ExecuteNonQuery();
                 if (result > 0)
@@ -359,10 +569,13 @@ namespace Event_UEH
 
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
-            ManageEvents();
+            QuanLySuKien();
         }
 
-        private static void EditEvent()
+
+
+        // Chức năng chính sửa sự kiện
+        private static void ChinhSuaSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Sửa sự kiện ===");
@@ -481,12 +694,11 @@ namespace Event_UEH
 
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
-            ManageEvents();
+            QuanLySuKien();
         }
 
-
-
-        private static void DeleteEvent()
+        // Chức năng xóa sự kiện
+        private static void XoaSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Xóa sự kiện ===");
@@ -528,11 +740,11 @@ namespace Event_UEH
 
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
-            ManageEvents();
+            QuanLySuKien();
         }
 
-
-        private static void DisplayEvents()
+        // Chức năng hiển thị sự kiện
+        private static void HienThiAllSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Danh sách sự kiện ===");
@@ -548,7 +760,7 @@ namespace Event_UEH
                     Console.WriteLine("Không thể kết nối tới cơ sở dữ liệu.");
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    ManageEvents();
+                    QuanLySuKien();
                     return;
                 }
 
@@ -591,16 +803,10 @@ namespace Event_UEH
             Console.WriteLine(new string('-', 125)); // Đường kẻ phân cách
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
-            ManageEvents();
+            QuanLySuKien();
         }
 
-        private static void ViewReports()
-        {
-            Console.WriteLine("Thống kê báo cáo - Chức năng sẽ được thêm sau.");
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ShowDashboard();
-        }
+        // Chức năng thống kê và báo cáo
         public static void GenerateReport()
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -631,11 +837,13 @@ namespace Event_UEH
             }
         }
     
-
+        // Phương thức lấy số lượng sự kiện đang có
         private static string FormatNumber(int number)
         {
             return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
         }
+
+        // Phương thức để lấy tổng số sự kiện
         public static int GetTotalEvents(SqlConnection connection)
         {
             string query = "SELECT COUNT(*) FROM Events";
@@ -668,7 +876,6 @@ namespace Event_UEH
                 return result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
             }
         }
-
 
 
         // Phương thức để lấy tổng số người đăng ký

@@ -4,65 +4,129 @@ using System.Data.SqlClient;
 using static Event_UEH.User;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 
 namespace Event_UEH 
 {
     public class Student
     {
+        private static string[] options = new[]
+        {
+           "📅 Đăng ký sự kiện",
+           "⭐ Đánh giá sự kiện",
+           "📜 Xem danh sách sự kiện đã đăng ký",
+           "❌ Hủy đăng ký sự kiện",
+           "🔍 Tìm kiếm sự kiện",
+           "🎉 Hiển thị toàn bộ sự kiện",
+           "🛠️ Cập nhật thông tin tài khoản",
+           "🎮 Chơi game giải trí",
+           "🌤️ Xem thời tiết",
+           "🚪 Đăng xuất"
+        };
+        private static int currentSelection = 0; // Chỉ số lựa chọn hiện tại
+
         // Sử dụng Session.CurrentUserId để lấy ID người dùng hiện tại
         public static void ShowDashboard()
         {
-            Console.Clear();
-            Console.WriteLine("=== Giao diện Sinh viên ===");
-            Console.WriteLine("Chức năng:");
-            Console.WriteLine("1. Đăng ký sự kiện");
-            Console.WriteLine("2. Đánh giá sự kiện");
-            Console.WriteLine("3. Xem danh sách sự kiện đã đăng ký");
-            Console.WriteLine("4. Hủy đăng ký sự kiện");
-            Console.WriteLine("5. Tìm kiếm sự kiện");
-            Console.WriteLine("6. Hiển thị toàn bộ sự kiện");
-            Console.WriteLine("7. Chơi game giải trí");
-            Console.WriteLine("8. Xem thời tiết");
-            Console.WriteLine("9. Đăng xuất");
-            Console.Write("Nhập lựa chọn: ");
-            string choice = Console.ReadLine();
-
-            switch (choice)
+            while (true) // Vòng lặp để giữ cho giao diện hiển thị cho đến khi người dùng chọn đăng xuất
             {
-                case "1":
+                Console.Clear();
+                Console.WriteLine("=== Giao diện Sinh viên ===");
+                Console.WriteLine("Chức năng:");
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == currentSelection)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan; // Đổi màu lựa chọn hiện tại
+                        Console.WriteLine($"> {options[i]} <"); // Hiển thị lựa chọn hiện tại với dấu mũi tên
+                        Console.ResetColor(); // Khôi phục màu sắc
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {options[i]}");
+                    }
+                }
+
+                // Kiểm tra phím được nhấn
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    currentSelection = (currentSelection > 0) ? currentSelection - 1 : options.Length - 1; // Di chuyển lên
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    currentSelection = (currentSelection < options.Length - 1) ? currentSelection + 1 : 0; // Di chuyển xuống
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    ExecuteSelection(currentSelection); // Thực hiện lựa chọn hiện tại
+                }
+            }
+        }
+
+        private static void ExecuteSelection(int selection)
+        {
+            switch (selection)
+            {
+                case 0:
                     RegisterEvent();
                     break;
-                case "2":
+                case 1:
                     EvaluateEvent();
-                    Console.WriteLine("Cảm ơn bạn đã đánh giá,Nhấn phím bất kỳ để quay lại... ");
+                    Console.WriteLine("Cảm ơn bạn đã đánh giá! Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    ShowDashboard();
-                    break;
-                case "3":
+                    break; // Quay lại vòng lặp chính
+                case 2:
                     ViewRegisteredEvents();
-                    break;
-                case "4":
-                    CancelRegistration();
-                    break;
-                case "5":
-                    SearchEvents();
-                    break;
-                case "6":
-                    DisplayAllEvents();
-                    break;
-                case "7":
-                    Console.Clear();
-                    AiLaTrieuPhu.ChoiTroChoi();
-                    Console.WriteLine(" Nhấn phím bất kỳ để quay lại...");
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    ShowDashboard();
-                    break;
-                case "8":
+                    break; // Quay lại vòng lặp chính
+                case 3:
+                    CancelRegistration();
+                    break; // Quay lại vòng lặp chính
+                case 4:
+                    SearchEvents();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    break; // Quay lại vòng lặp chính
+                case 5:
+                    DisplayAllEvents();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    break; // Quay lại vòng lặp chính
+                case 6:
+                    UpdateAccount(); // Gọi phương thức cập nhật thông tin tài khoản
+                    break; // Quay lại vòng lặp chính
+                case 7:
+                    Console.WriteLine("What game do you want to play? 1 or 2 ");
+                    string choice = Console.ReadLine();
+                    switch (choice)
+                    {
+                        case " 1":
+                            AiLaTrieuPhu.ChoiTroChoi();
+                            Console.WriteLine();
+                            Console.ReadKey();
+                            Console.Clear(); // Xóa màn hình sau khi chơi game
+                            ShowDashboard();
+                            break;
+                        case "2":
+                            Console.Clear();
+                            SnakeGame.StartGameSnake();
+                            Console.WriteLine();
+                            Console.ReadKey();
+                            Console.Clear(); // Xóa màn hình sau khi chơi game
+                            ShowDashboard();
+                            break;
+                    }
+                    break; // Quay lại vòng lặp chính
+                case 8:
                     Weather();
                     break;
-                case "9":
+                case 9:
                     Console.WriteLine("Đăng xuất thành công!");
+                    Program.MainMenu();
+                    return;
                     break;
                 default:
                     Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
@@ -71,6 +135,7 @@ namespace Event_UEH
                     break;
             }
         }
+
         // Chức năng đánh giá sự kiện
         private static void EvaluateEvent()
         {
@@ -404,61 +469,70 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Tìm kiếm sự kiện ===");
-            Console.Write("Nhập từ khóa tìm kiếm: ");
-            string keyword = Console.ReadLine();
+            Console.WriteLine("Bạn có thể tìm kiếm theo:");
+            Console.WriteLine("1. ID sự kiện");
+            Console.WriteLine("2. Tên sự kiện");
+            Console.WriteLine("3. Tên câu lạc bộ tổ chức");
+            Console.WriteLine("4. Địa điểm tổ chức");
+            Console.Write("Chọn phương thức tìm kiếm (1-4): ");
+            string searchChoice = Console.ReadLine();
 
-            // Cập nhật truy vấn SQL để lấy thêm thông tin sự kiện
-            string searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Title LIKE @keyword";
+            string searchQuery = "";
+            SqlParameter searchParameter = null;
 
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            // Tạo truy vấn SQL và tham số tìm kiếm tùy vào lựa chọn của người dùng
+            switch (searchChoice)
             {
-                using (SqlCommand searchCommand = new SqlCommand(searchQuery, connection))
-                {
-                    searchCommand.Parameters.AddWithValue("@keyword", "%" + keyword + "%");
-
-                    try
+                case "1": // Tìm kiếm theo ID sự kiện
+                    Console.Write("Nhập ID sự kiện: ");
+                    if (int.TryParse(Console.ReadLine(), out int eventId))
                     {
-                        SqlDataReader reader = searchCommand.ExecuteReader();
-                        if (reader.HasRows)
-                        {
-                            Console.WriteLine(new string('=', 30)); // Dòng phân cách
-                            while (reader.Read())
-                            {
-                                // Hiển thị thông tin của sự kiện
-                                Console.WriteLine($"ID: {reader["Id"]}");
-                                Console.WriteLine($"Tiêu đề: {reader["Title"]}");
-                                Console.WriteLine($"Mô tả: {reader["Description"]}");
-                                Console.WriteLine($"Ngày bắt đầu: {reader["StartDate"]}");
-                                Console.WriteLine($"Ngày kết thúc: {reader["EndDate"]}");
-                                Console.WriteLine($"Địa điểm: {reader["Location"]}");
-
-                                // Lấy tên người tổ chức
-                                int createdBy = (int)reader["CreatedBy"];
-                                string organizerName = GetOrganizerName(createdBy);
-                                Console.WriteLine($"Người tổ chức: {organizerName}");
-
-                                Console.WriteLine(new string('-', 40)); // Dòng phân cách giữa các sự kiện
-                            }
-                            Console.WriteLine(new string('=', 30)); // Kết thúc danh sách
-                        }
-                        else
-                        {
-                            Console.WriteLine("Không tìm thấy sự kiện nào phù hợp với từ khóa.");
-                        }
+                        searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Id = @searchValue";
+                        searchParameter = new SqlParameter("@searchValue", eventId);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Console.WriteLine($"Lỗi: {ex.Message}");
+                        Console.WriteLine("ID không hợp lệ.");
+                        Console.ReadKey();
+                        ShowDashboard();
+                        return;
                     }
-                }
+                    break;
+
+                case "2": // Tìm kiếm theo tên sự kiện
+                    Console.Write("Nhập tên sự kiện: ");
+                    string eventName = Console.ReadLine();
+                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Title LIKE @searchValue";
+                    searchParameter = new SqlParameter("@searchValue", "%" + eventName + "%");
+                    break;
+
+                case "3": // Tìm kiếm theo tên câu lạc bộ tổ chức
+                    Console.Write("Nhập tên câu lạc bộ tổ chức: ");
+                    string clubName = Console.ReadLine();
+                    searchQuery = @"
+                SELECT E.Id, E.Title, E.Description, E.StartDate, E.EndDate, E.Location, E.CreatedBy 
+                FROM Events E 
+                JOIN Users U ON E.CreatedBy = U.Id
+                WHERE U.FullName LIKE @searchValue";
+                    searchParameter = new SqlParameter("@searchValue", "%" + clubName + "%");
+                    break;
+
+                case "4": // Tìm kiếm theo địa điểm
+                    Console.Write("Nhập địa điểm: ");
+                    string location = Console.ReadLine();
+                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Location LIKE @searchValue";
+                    searchParameter = new SqlParameter("@searchValue", "%" + location + "%");
+                    break;
+
+                default:
+                    Console.WriteLine("Lựa chọn không hợp lệ.");
+                    Console.ReadKey();
+                    ShowDashboard();
+                    return;
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ShowDashboard();
         }
 
-
+        // Chức năng xem thời tiết bằng cách gọi API bên ngoài của Open Weather Map
         public static void Weather()
         {
             string apiKey = "be3294eb40ddf30921e33ae77653c6f8"; // Thay bằng API Key của bạn
@@ -529,5 +603,68 @@ namespace Event_UEH
             ShowDashboard(); // Giả sử đây là hàm quay lại giao diện chính
         }
 
+        //chức năng thay đổi thông tin tài khoản
+        public static void UpdateAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== Cập nhật tài khoản ===");
+
+            // Lấy thông tin hiện tại của sinh viên từ cơ sở dữ liệu
+            string selectQuery = "SELECT FullName, Email FROM Users WHERE Id = @userId";
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                using (SqlCommand selectCommand = new SqlCommand(selectQuery, connection))
+                {
+                    selectCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
+                    SqlDataReader reader = selectCommand.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        Console.WriteLine($"Họ và tên hiện tại: {reader["FullName"]}");
+                        Console.WriteLine($"Email hiện tại: {reader["Email"]}");
+
+                    }
+                    reader.Close();
+                }
+                // Nhập thông tin mới
+                Console.Write("Nhập họ và tên mới (bỏ qua để giữ nguyên): ");
+                string newFullName = Console.ReadLine();
+                Console.Write("Nhập email mới (bỏ qua để giữ nguyên): ");
+                string newEmail = Console.ReadLine();
+                Console.Write("Nhập mật khẩu mới (bỏ qua để giữ nguyên): ");
+                string newPassword = Console.ReadLine();
+
+                // Chỉ cập nhật các trường mà người dùng đã nhập
+                string updateQuery = "UPDATE Users SET FullName = COALESCE(NULLIF(@newFullName, ''), FullName), " +
+                                     "Email = COALESCE(NULLIF(@newEmail, ''), Email), " +
+                                     "Password = COALESCE(NULLIF(@newPassword, ''), Password) " +
+                                     "WHERE Id = @userId";
+                using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
+                {
+                    updateCommand.Parameters.AddWithValue("@newFullName", newFullName);
+                    updateCommand.Parameters.AddWithValue("@newEmail", newEmail);
+                    updateCommand.Parameters.AddWithValue("@newPassword", string.IsNullOrEmpty(newPassword) ? DBNull.Value : newPassword);
+                    updateCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
+
+                    try
+                    {
+                        int result = updateCommand.ExecuteNonQuery();
+                        Console.WriteLine(result > 0 ? "Cập nhật tài khoản thành công." : "Không có thông tin nào được cập nhật.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Lỗi: {ex.Message}");
+                    }
+                }
+            }
+            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+            Console.ReadKey();
+            ShowDashboard(); // Quay lại giao diện chính sau khi cập nhật
+        }
+
     }
+
+
+
+
+    
 }
