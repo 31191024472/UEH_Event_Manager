@@ -105,7 +105,7 @@ namespace Event_UEH
                     string choice = Console.ReadLine();
                     switch (choice)
                     {
-                        case " 1":
+                        case "1":
                             AiLaTrieuPhu.ChoiTroChoi();
                             Console.WriteLine();
                             Console.ReadKey();
@@ -114,7 +114,7 @@ namespace Event_UEH
                             break;
                         case "2":
                             Console.Clear();
-                            SnakeGame.StartGameSnake();
+                            QuanLySuKien_UEH.TroChoiRan.BatDauTroChoiRan();
                             Console.WriteLine();
                             Console.ReadKey();
                             Console.Clear(); // Xóa màn hình sau khi chơi game
