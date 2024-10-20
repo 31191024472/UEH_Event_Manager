@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Text;
-using QuanLySuKien_UEH;
 
 
 namespace Event_UEH
@@ -106,7 +105,7 @@ namespace Event_UEH
                     string choice = Console.ReadLine();
                     switch (choice)
                     {
-                        case "1":
+                        case " 1":
                             AiLaTrieuPhu.ChoiTroChoi();
                             Console.WriteLine();
                             Console.ReadKey();
@@ -115,7 +114,7 @@ namespace Event_UEH
                             break;
                         case "2":
                             Console.Clear();
-                            TroChoiRan.BatDauTroChoiRan();
+                            SnakeGame.StartGameSnake();
                             Console.WriteLine();
                             Console.ReadKey();
                             Console.Clear(); // Xóa màn hình sau khi chơi game
@@ -467,7 +466,6 @@ namespace Event_UEH
             ShowDashboard();
         }
 
-        // Chức năng tìm kiếm sự kiện
         private static void SearchEvents()
         {
             Console.Clear();
@@ -483,7 +481,6 @@ namespace Event_UEH
             string searchQuery = "";
             SqlParameter searchParameter = null;
 
-            // Tạo truy vấn SQL và tham số tìm kiếm tùy vào lựa chọn của người dùng
             switch (searchChoice)
             {
                 case "1": // Tìm kiếm theo ID sự kiện
@@ -513,10 +510,10 @@ namespace Event_UEH
                     Console.Write("Nhập tên câu lạc bộ tổ chức: ");
                     string clubName = Console.ReadLine();
                     searchQuery = @"
-                SELECT E.Id, E.Title, E.Description, E.StartDate, E.EndDate, E.Location, E.CreatedBy 
-                FROM Events E 
-                JOIN Users U ON E.CreatedBy = U.Id
-                WHERE U.FullName LIKE @searchValue";
+        SELECT E.Id, E.Title, E.Description, E.StartDate, E.EndDate, E.Location, E.CreatedBy 
+        FROM Events E 
+        JOIN Users U ON E.CreatedBy = U.Id
+        WHERE U.FullName LIKE @searchValue";
                     searchParameter = new SqlParameter("@searchValue", "%" + clubName + "%");
                     break;
 
@@ -533,7 +530,44 @@ namespace Event_UEH
                     ShowDashboard();
                     return;
             }
+
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                using (SqlCommand searchCommand = new SqlCommand(searchQuery, connection))
+                {
+                    searchCommand.Parameters.Add(searchParameter);
+                    SqlDataReader reader = searchCommand.ExecuteReader();
+
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("Không tìm thấy sự kiện.");
+                    }
+                    else
+                    {
+                        while (reader.Read())
+                        {
+                            // Hiển thị thông tin sự kiện
+                            Console.WriteLine($"ID: {reader["Id"]}");
+                            Console.WriteLine($"Tiêu đề: {reader["Title"]}");
+                            Console.WriteLine($"Mô tả: {reader["Description"]}");
+                            Console.WriteLine($"Ngày bắt đầu: {reader["StartDate"]}");
+                            Console.WriteLine($"Ngày kết thúc: {reader["EndDate"]}");
+                            Console.WriteLine($"Địa điểm: {reader["Location"]}");
+
+                            int createdBy = (int)reader["CreatedBy"];
+                            string organizerName = GetOrganizerName(createdBy);
+                            Console.WriteLine($"Người tổ chức: {organizerName}");
+                            Console.WriteLine(new string('-', 40)); // Dòng phân cách
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+            Console.ReadKey();
+            ShowDashboard();
         }
+
 
         // Chức năng xem thời tiết bằng cách gọi API bên ngoài của Open Weather Map
         public static void Weather()
