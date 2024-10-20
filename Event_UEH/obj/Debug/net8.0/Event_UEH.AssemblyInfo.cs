@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Event_UEH")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+60851ae8f60c5bf4699e2d18cfebc267b372497d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae3434f0ff5f1bb4a95ce888332ad1afd55a7394")]
 [assembly: System.Reflection.AssemblyProductAttribute("Event_UEH")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Event_UEH")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
