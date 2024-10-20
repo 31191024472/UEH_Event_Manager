@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
+using System.Text;
 using static Event_UEH.User;
 
 namespace Event_UEH
@@ -646,19 +648,57 @@ namespace Event_UEH
                     {
                         Console.WriteLine($"Họ và tên hiện tại: {reader["FullName"]}");
                         Console.WriteLine($"Email hiện tại: {reader["Email"]}");
-
                     }
                     reader.Close();
                 }
-                // Nhập thông tin mới
+
+                // Nhập họ và tên mới (người dùng có thể bỏ qua)
                 Console.Write("Nhập họ và tên mới (bỏ qua để giữ nguyên): ");
                 string newFullName = Console.ReadLine();
-                Console.Write("Nhập email mới (bỏ qua để giữ nguyên): ");
-                string newEmail = Console.ReadLine();
-                Console.Write("Nhập mật khẩu mới (bỏ qua để giữ nguyên): ");
-                string newPassword = Console.ReadLine();
 
-                // Chỉ cập nhật các trường mà người dùng đã nhập
+                // Nhập email mới (người dùng có thể bỏ qua)
+                string newEmail;
+                while (true)
+                {
+                    Console.Write("Nhập email mới (bỏ qua để giữ nguyên): ");
+                    newEmail = Console.ReadLine();
+
+                    if (string.IsNullOrEmpty(newEmail))
+                    {
+                        break; // Người dùng không nhập email
+                    }
+                    else if (!IsValidEmail(newEmail))
+                    {
+                        Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
+                    }
+                    else
+                    {
+                        break; // Email hợp lệ
+                    }
+                }
+
+                // Nhập mật khẩu mới (người dùng có thể bỏ qua)
+                string newPassword;
+                while (true)
+                {
+                    Console.Write("Nhập mật khẩu mới (bỏ qua để giữ nguyên): ");
+                    newPassword = ReadPassword();
+
+                    if (string.IsNullOrEmpty(newPassword))
+                    {
+                        break; // Không đổi mật khẩu
+                    }
+                    if (!IsValidPassword(newPassword))
+                    {
+                        Console.WriteLine("Mật khẩu phải có ít nhất 8 ký tự và bao gồm cả chữ và số. Vui lòng thử lại.");
+                    }
+                    else
+                    {
+                        break; // Mật khẩu hợp lệ
+                    }
+                }
+
+                // Cập nhật thông tin người dùng
                 string updateQuery = "UPDATE Users SET FullName = COALESCE(NULLIF(@newFullName, ''), FullName), " +
                                      "Email = COALESCE(NULLIF(@newEmail, ''), Email), " +
                                      "Password = COALESCE(NULLIF(@newPassword, ''), Password) " +
@@ -666,7 +706,7 @@ namespace Event_UEH
                 using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                 {
                     updateCommand.Parameters.AddWithValue("@newFullName", newFullName);
-                    updateCommand.Parameters.AddWithValue("@newEmail", newEmail);
+                    updateCommand.Parameters.AddWithValue("@newEmail", string.IsNullOrEmpty(newEmail) ? DBNull.Value : newEmail);
                     updateCommand.Parameters.AddWithValue("@newPassword", string.IsNullOrEmpty(newPassword) ? DBNull.Value : newPassword);
                     updateCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
 
@@ -681,10 +721,65 @@ namespace Event_UEH
                     }
                 }
             }
+
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
             ShowDashboard(); // Quay lại giao diện chính sau khi cập nhật
         }
+
+        // Kiểm tra định dạng email hợp lệ
+        private static bool IsValidEmail(string email)
+        {
+            string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, pattern);
+        }
+
+        // Phương thức đọc mật khẩu và hiển thị dấu *
+        private static string ReadPassword()
+        {
+            StringBuilder password = new StringBuilder();
+            ConsoleKeyInfo keyInfo;
+
+            do
+            {
+                keyInfo = Console.ReadKey(intercept: true);
+                if (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Backspace)
+                {
+                    password.Append(keyInfo.KeyChar);
+                    Console.Write("*");
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
+                {
+                    password.Remove(password.Length - 1, 1);
+                    Console.Write("\b \b");
+                }
+            } while (keyInfo.Key != ConsoleKey.Enter);
+
+            Console.WriteLine();
+            return password.ToString();
+        }
+
+        // Kiểm tra tính hợp lệ của mật khẩu
+        private static bool IsValidPassword(string password)
+        {
+            if (password.Length < 8)
+                return false;
+
+            bool hasLetter = false, hasDigit = false;
+            foreach (char c in password)
+            {
+                if (char.IsLetter(c))
+                    hasLetter = true;
+                if (char.IsDigit(c))
+                    hasDigit = true;
+
+                if (hasLetter && hasDigit)
+                    return true; // Mật khẩu hợp lệ
+            }
+
+            return false; // Mật khẩu không hợp lệ
+        }
+
 
     }
 }

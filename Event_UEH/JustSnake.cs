@@ -3,312 +3,265 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Event_UEH
+namespace QuanLySuKien_UEH
 {
-    public class SnakeGame
+    public class TroChoiRan
     {
-        //Easy way to access element's coordinations
-        struct Position
+        // Cách dễ dàng để truy cập tọa độ của các phần tử
+        struct ViTri
         {
-            public int row;
-            public int col;
+            public int dong;
+            public int cot;
 
-            public Position(int row, int col)
+            public ViTri(int dong, int cot)
             {
-                this.row = row;
-                this.col = col;
+                this.dong = dong;
+                this.cot = cot;
             }
         }
 
-        public static void StartGameSnake()
+        public static void BatDauTroChoiRan()
         {
-        end:
-            Console.Title = "SNAKE - MADE BY MARTIN NIKOLOV";
+        ketThuc:
+            Console.Title = "SNAKE - DO MARTIN NIKOLOV LÀM";
 
-            //Set Console's Windows Sizes
+            // Cài đặt kích thước cửa sổ Console
             Console.WindowHeight = 25;
             Console.WindowWidth = 50;
 
-            //Set Console's Buffer Sizes;
+            // Cài đặt kích thước bộ đệm của Console
             Console.BufferHeight = Console.WindowHeight;
             Console.BufferWidth = Console.WindowWidth;
 
-            //Random Generator
+            // Bộ tạo số ngẫu nhiên
             Random randomNumberGenerator = new Random();
 
-            //Variable increasing the speed
-            double speedIncreaser = 100;
+            // Biến tăng tốc độ
+            double tangToc = 100;
 
-            //First elemets of our snake
-            Queue<Position> snakeElements = new Queue<Position>();
+            // Các phần tử đầu tiên của con rắn
+            Queue<ViTri> cacPhanTuRan = new Queue<ViTri>();
             for (int i = 0; i <= 4; i++)
             {
-                snakeElements.Enqueue(new Position(0, i));
+                cacPhanTuRan.Enqueue(new ViTri(0, i));
             }
 
-            //Generating random coordinations of food
-            Position food;
-            int foodPushTime;
+            // Tạo tọa độ ngẫu nhiên cho thức ăn
+            ViTri thucAn;
+            int thoiGianDatThucAn;
             do
             {
-                food = new Position(
+                thucAn = new ViTri(
                     randomNumberGenerator.Next(1, Console.WindowHeight - 1),
                     randomNumberGenerator.Next(1, Console.WindowWidth - 1));
-                foodPushTime = Environment.TickCount;
+                thoiGianDatThucAn = Environment.TickCount;
             }
-            while (snakeElements.Contains(food));
+            while (cacPhanTuRan.Contains(thucAn));
 
-            //Print food on the Console
+            // Hiển thị thức ăn trên Console
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.SetCursorPosition(food.col, food.row);
+            Console.SetCursorPosition(thucAn.cot, thucAn.dong);
             Console.Write("@");
             Console.ResetColor();
 
-            //Rock
-            List<Position> rocks = new List<Position>();
+            // Đá
+            List<ViTri> cacVienDa = new List<ViTri>();
             for (int i = 0; i < randomNumberGenerator.Next(1, 11); i++)
             {
                 do
                 {
-                    rocks.Add(new Position(randomNumberGenerator.Next(1, Console.WindowHeight - 1),
+                    cacVienDa.Add(new ViTri(randomNumberGenerator.Next(1, Console.WindowHeight - 1),
                         randomNumberGenerator.Next(1, Console.WindowWidth - 1)));
                 }
-                while (snakeElements.Contains(rocks[i]) ||
-                       (food.row == rocks[i].row && food.col == rocks[i].col));
+                while (cacPhanTuRan.Contains(cacVienDa[i]) ||
+                       (thucAn.dong == cacVienDa[i].dong && thucAn.cot == cacVienDa[i].cot));
             }
 
-            //Print rocks
-            foreach (Position rock in rocks)
+            // Hiển thị đá
+            foreach (ViTri da in cacVienDa)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.SetCursorPosition(rock.col, rock.row);
+                Console.SetCursorPosition(da.cot, da.dong);
                 Console.Write("=");
                 Console.ResetColor();
             }
 
-            //Easy way to access every direction
-            byte right = 0;
-            byte left = 1;
-            byte down = 2;
-            byte up = 3;
+            // Các hướng di chuyển
+            byte phai = 0;
+            byte trai = 1;
+            byte xuong = 2;
+            byte len = 3;
 
-            //Available directions
-            Position[] directions =
+            // Các hướng khả dụng
+            ViTri[] huongDiChuyen =
             {
-                new Position(0,1), //Right
-                new Position(0,-1), //Left
-                new Position(1,0), //Down
-                new Position(-1,0)//Up
+                new ViTri(0,1), // Phải
+                new ViTri(0,-1), // Trái
+                new ViTri(1,0), // Xuống
+                new ViTri(-1,0) // Lên
             };
 
-            //Set start direction - easiest right
-            byte currentDirection = right;
+            // Cài đặt hướng bắt đầu - dễ nhất là đi phải
+            byte huongHienTai = phai;
 
-            //Print snake with the default coordinations
-            foreach (Position item in snakeElements)
+            // Hiển thị rắn với các tọa độ mặc định
+            foreach (ViTri item in cacPhanTuRan)
             {
-                Console.SetCursorPosition(item.col, item.row);
+                Console.SetCursorPosition(item.cot, item.dong);
                 Console.Write("*");
             }
 
             while (true)
             {
-                //Check if we are typed specific key
+                // Kiểm tra nếu có nhấn phím nào đó
                 if (Console.KeyAvailable)
                 {
-                    //We are typed any key => we have to keep this key in variable
-                    ConsoleKeyInfo userKeyInput = Console.ReadKey();
+                    ConsoleKeyInfo nhapTuBanPhim = Console.ReadKey();
 
-                    //Now we check which is this key
-                    if (userKeyInput.Key == ConsoleKey.RightArrow)
+                    if (nhapTuBanPhim.Key == ConsoleKey.RightArrow && huongHienTai != trai)
                     {
-                        //Change position if only old position is not opposite of new position
-                        if (currentDirection != left)
-                            currentDirection = right;
+                        huongHienTai = phai;
                     }
-                    else if (userKeyInput.Key == ConsoleKey.LeftArrow)
+                    else if (nhapTuBanPhim.Key == ConsoleKey.LeftArrow && huongHienTai != phai)
                     {
-                        if (currentDirection != right)
-                            currentDirection = left;
+                        huongHienTai = trai;
                     }
-                    else if (userKeyInput.Key == ConsoleKey.DownArrow)
+                    else if (nhapTuBanPhim.Key == ConsoleKey.DownArrow && huongHienTai != len)
                     {
-                        if (currentDirection != up)
-                            currentDirection = down;
+                        huongHienTai = xuong;
                     }
-                    else if (userKeyInput.Key == ConsoleKey.UpArrow)
+                    else if (nhapTuBanPhim.Key == ConsoleKey.UpArrow && huongHienTai != xuong)
                     {
-                        if (currentDirection != down)
-                            currentDirection = up;
+                        huongHienTai = len;
                     }
                 }
 
-                //Get current coordinatios of snake head
-                Position snakeCurrentHead = snakeElements.Last();
+                ViTri dauRanHienTai = cacPhanTuRan.Last();
+                ViTri huongTiepTheo = huongDiChuyen[huongHienTai];
+                ViTri dauRanMoi = new ViTri(
+                    dauRanHienTai.dong + huongTiepTheo.dong,
+                    dauRanHienTai.cot + huongTiepTheo.cot);
 
-                //Calculation coordinatios of next direction
-                Position nextDirection = directions[currentDirection];
-
-                //Calculation coordinatios of the new snake head
-                Position snakeNewHead = new Position(
-                    snakeCurrentHead.row + nextDirection.row,
-                    snakeCurrentHead.col + nextDirection.col);
-
-                //Check if snake kill yourself
-                if (snakeElements.Contains(snakeNewHead) || rocks.Contains(snakeNewHead))
+                if (cacPhanTuRan.Contains(dauRanMoi) || cacVienDa.Contains(dauRanMoi))
                 {
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.White;
                     Console.SetCursorPosition(0, 0);
-                    Console.WriteLine("GAME OVER!" + "\n" + "Your points are {0}!", (snakeElements.Count - 5) * 100);
+                    Console.WriteLine("GAME OVER!" + "\n" + "Điểm số của bạn là {0}!", (cacPhanTuRan.Count - 5) * 100);
 
                     Console.SetCursorPosition(10, 11);
-                    Console.WriteLine("Press [SPACE] for new game...");
+                    Console.WriteLine("Nhấn [SPACE] để chơi lại...");
 
                     Console.SetCursorPosition(0, Console.WindowHeight - 1);
-                    ConsoleKeyInfo userKeyInput = Console.ReadKey();
+                    ConsoleKeyInfo nhapTuBanPhim = Console.ReadKey();
 
-                    if (userKeyInput.Key == ConsoleKey.Spacebar)
+                    if (nhapTuBanPhim.Key == ConsoleKey.Spacebar)
                     {
                         Console.ResetColor();
                         Console.Clear();
-                        goto end;
+                        goto ketThuc;
                     }
                     else
                     {
                         Console.ResetColor();
-
                         Console.SetCursorPosition(0, Console.WindowHeight - 1);
                         return;
                     }
                 }
 
-                //Check if snake is got the food, if not clear last element
-                if (snakeNewHead.row == food.row && snakeNewHead.col == food.col)
+                if (dauRanMoi.dong == thucAn.dong && dauRanMoi.cot == thucAn.cot)
                 {
-                    Console.SetCursorPosition(food.col, food.row);
+                    Console.SetCursorPosition(thucAn.cot, thucAn.dong);
                     Console.Write(" ");
 
                     Console.Beep(80, 50);
 
                     do
                     {
-                        food = new Position(
+                        thucAn = new ViTri(
                             randomNumberGenerator.Next(1, Console.WindowHeight - 1),
                             randomNumberGenerator.Next(1, Console.WindowWidth - 1));
-                        foodPushTime = Environment.TickCount;
+                        thoiGianDatThucAn = Environment.TickCount;
                     }
-                    while (snakeElements.Contains(food) || rocks.Contains(food));
+                    while (cacPhanTuRan.Contains(thucAn) || cacVienDa.Contains(thucAn));
 
-                    //Print food on the Console
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.SetCursorPosition(food.col, food.row);
+                    Console.SetCursorPosition(thucAn.cot, thucAn.dong);
                     Console.Write("@");
                     Console.ResetColor();
 
-                    int fiftyFifty = randomNumberGenerator.Next(1, 3);
+                    int randomDa = randomNumberGenerator.Next(1, 3);
 
-                    if (fiftyFifty == 1)
+                    if (randomDa == 1)
                     {
-                        //Adding new rock
-                        Position rockElement;
-
+                        ViTri daMoi;
                         do
                         {
-                            rockElement = new Position(randomNumberGenerator.Next(1, Console.WindowHeight - 1),
+                            daMoi = new ViTri(randomNumberGenerator.Next(1, Console.WindowHeight - 1),
                                 randomNumberGenerator.Next(1, Console.WindowWidth - 1));
                         }
-                        while (snakeElements.Contains(rockElement) ||
-                               (food.row == rockElement.row && food.col == rockElement.col));
+                        while (cacPhanTuRan.Contains(daMoi) || (thucAn.dong == daMoi.dong && thucAn.cot == daMoi.cot));
 
-                        rocks.Add(new Position(rockElement.row, rockElement.col));
+                        cacVienDa.Add(new ViTri(daMoi.dong, daMoi.cot));
 
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.SetCursorPosition(rockElement.col, rockElement.row);
+                        Console.SetCursorPosition(daMoi.cot, daMoi.dong);
                         Console.Write("=");
                         Console.ResetColor();
                     }
                 }
                 else
                 {
-                    //Get and clear last element of snake
-                    Position lastElement = snakeElements.Dequeue();
-                    Console.SetCursorPosition(lastElement.col, lastElement.row);
+                    ViTri phanTuCuoi = cacPhanTuRan.Dequeue();
+                    Console.SetCursorPosition(phanTuCuoi.cot, phanTuCuoi.dong);
                     Console.Write(" ");
                 }
 
-                //Check if coordinatios of new head are available
-                if (snakeNewHead.row < 0)
-                    snakeNewHead.row = Console.WindowHeight - 2;
-                else if (snakeNewHead.row >= Console.WindowHeight - 1)
-                    snakeNewHead.row = 0;
-                else if (snakeNewHead.col < 0)
-                    snakeNewHead.col = Console.WindowWidth - 2;
-                else if (snakeNewHead.col >= Console.WindowWidth - 1)
-                    snakeNewHead.col = 0;
+                if (dauRanMoi.dong < 0)
+                    dauRanMoi.dong = Console.WindowHeight - 2;
+                else if (dauRanMoi.dong >= Console.WindowHeight - 1)
+                    dauRanMoi.dong = 0;
+                else if (dauRanMoi.cot < 0)
+                    dauRanMoi.cot = Console.WindowWidth - 2;
+                else if (dauRanMoi.cot >= Console.WindowWidth - 1)
+                    dauRanMoi.cot = 0;
 
-                //Convert old head as a body
-                Console.SetCursorPosition(snakeCurrentHead.col, snakeCurrentHead.row);
+                Console.SetCursorPosition(dauRanHienTai.cot, dauRanHienTai.dong);
                 Console.WriteLine("*");
 
-                //Print head with a individual symbol
-                snakeElements.Enqueue(snakeNewHead);
-                Console.SetCursorPosition(snakeNewHead.col, snakeNewHead.row);
-                if (currentDirection == right)
+                cacPhanTuRan.Enqueue(dauRanMoi);
+                Console.SetCursorPosition(dauRanMoi.cot, dauRanMoi.dong);
+                if (huongHienTai == phai)
                     Console.Write(">");
-                else if (currentDirection == left)
+                else if (huongHienTai == trai)
                     Console.Write("<");
-                else if (currentDirection == down)
+                else if (huongHienTai == xuong)
                     Console.Write("V");
-                else if (currentDirection == up)
+                else if (huongHienTai == len)
                     Console.Write("^");
 
-                if (Environment.TickCount - foodPushTime >= 6000)
+                if (Environment.TickCount - thoiGianDatThucAn >= 6000)
                 {
-                    Console.SetCursorPosition(food.col, food.row);
+                    Console.SetCursorPosition(thucAn.cot, thucAn.dong);
                     Console.Write(" ");
 
                     do
                     {
-                        food = new Position(
+                        thucAn = new ViTri(
                             randomNumberGenerator.Next(1, Console.WindowHeight - 1),
                             randomNumberGenerator.Next(1, Console.WindowWidth - 1));
-                        foodPushTime = Environment.TickCount;
+                        thoiGianDatThucAn = Environment.TickCount;
                     }
-                    while (snakeElements.Contains(food) || rocks.Contains(food));
+                    while (cacPhanTuRan.Contains(thucAn) || cacVienDa.Contains(thucAn));
 
-                    int fiftyFifty = randomNumberGenerator.Next(1, 3);
-
-                    if (fiftyFifty == 1)
-                    {
-                        //Adding new rock
-                        Position rockElement;
-
-                        do
-                        {
-                            rockElement = new Position(randomNumberGenerator.Next(1, Console.WindowHeight - 1),
-                                randomNumberGenerator.Next(1, Console.WindowWidth - 1));
-                        }
-                        while (snakeElements.Contains(rockElement) ||
-                               (food.row == rockElement.row && food.col == rockElement.col));
-
-                        rocks.Add(new Position(rockElement.row, rockElement.col));
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.SetCursorPosition(rockElement.col, rockElement.row);
-                        Console.Write("=");
-                        Console.ResetColor();
-                    }
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.SetCursorPosition(thucAn.cot, thucAn.dong);
+                    Console.Write("@");
+                    Console.ResetColor();
                 }
 
-                //Always show the food
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.SetCursorPosition(food.col, food.row);
-                Console.Write("@");
-                Console.ResetColor();
-
-                speedIncreaser = speedIncreaser - 0.025;
-                Thread.Sleep((int)speedIncreaser);
+                tangToc -= 0.01;
+                Thread.Sleep((int)tangToc);
             }
         }
     }
