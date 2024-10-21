@@ -15,7 +15,6 @@ namespace Event_UEH
     "📝 Chỉnh sửa sự kiện",
     "🗑️ Xóa sự kiện",
     "📋 Xem danh sách sự kiện đã tổ chức",
-    "🗂️ Xem danh sách sự kiện đã xóa",
     "👥 Xem danh sách người đăng ký",
     "🌤️ Xem thời tiết",
     "🛠️ Cập nhật thông tin tài khoản",
@@ -78,7 +77,6 @@ namespace Event_UEH
                     break; // Quay lại vòng lặp chính
                 case 2:
                     DeleteEvent();
-                    Console.WriteLine("Sự kiện đã bị xóa! Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
                 case 3:
@@ -87,24 +85,19 @@ namespace Event_UEH
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
                 case 4:
-                    ViewDeletedEvents();
-                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-                    Console.ReadKey();
-                    break; // Quay lại vòng lặp chính
-                case 5:
                     ShowRegisteredStudents(Session.CurrentUserId);
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
-                case 6:
+                case 5:
                     Weather();
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
-                case 7:
+                case 6:
                     UpdateAccount();
                     break; // Quay lại vòng lặp chính
-                case 8:
+                case 7:
                     Console.WriteLine("Đăng xuất thành công!");
                     Program.MainMenu();
                     return;
@@ -222,6 +215,22 @@ namespace Event_UEH
                 return;
             }
 
+            // Kiểm tra sự tồn tại của sự kiện
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                string checkQuery = "SELECT COUNT(1) FROM Events WHERE Id = @eventId";
+                using (SqlCommand command = new SqlCommand(checkQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@eventId", eventId);
+                    if ((int)command.ExecuteScalar() == 0)
+                    {
+                        Console.WriteLine("Sự kiện không tồn tại. Nhấn phím bất kỳ để quay lại.");
+                        Console.ReadKey();
+                        return;
+                    }
+                }
+            }
+
             Console.Write("Nhập tên mới (bỏ qua nếu không muốn thay đổi): ");
             string newTitle = Console.ReadLine();
 
@@ -236,9 +245,13 @@ namespace Event_UEH
             {
                 Console.Write("Nhập ngày bắt đầu mới (bỏ qua nếu không muốn thay đổi): ");
                 string startDateInput = Console.ReadLine();
-                if (string.IsNullOrEmpty(startDateInput) || (DateTime.TryParseExact(startDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var startDate) && startDate > DateTime.Now))
+                if (string.IsNullOrEmpty(startDateInput))
                 {
-                    //   newStartDate = startDate;
+                    break; // Bỏ qua nếu không muốn thay đổi
+                }
+                if (DateTime.TryParseExact(startDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var startDate) && startDate > DateTime.Now)
+                {
+                    newStartDate = startDate; // Lưu giá trị ngày bắt đầu nếu hợp lệ
                     break;
                 }
                 Console.WriteLine("Ngày bắt đầu phải sau ngày hiện tại. Vui lòng nhập lại.");
@@ -249,39 +262,68 @@ namespace Event_UEH
             {
                 Console.Write("Nhập ngày kết thúc mới (bỏ qua nếu không muốn thay đổi): ");
                 string endDateInput = Console.ReadLine();
-                if (string.IsNullOrEmpty(endDateInput) || (DateTime.TryParseExact(endDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var endDate) && endDate > newStartDate))
+                if (string.IsNullOrEmpty(endDateInput))
                 {
-                    //  newEndDate = endDate;
-                    break;
+                    break; // Bỏ qua nếu không muốn thay đổi
                 }
-                Console.WriteLine("Ngày kết thúc phải sau ngày bắt đầu. Vui lòng nhập lại.");
+                if (DateTime.TryParseExact(endDateInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out var endDate))
+                {
+                    if (newStartDate == null || endDate > newStartDate)
+                    {
+                        newEndDate = endDate; // Lưu giá trị ngày kết thúc nếu hợp lệ
+                        break;
+                    }
+                    Console.WriteLine("Ngày kết thúc phải sau ngày bắt đầu. Vui lòng nhập lại.");
+                }
+                else
+                {
+                    Console.WriteLine("Định dạng ngày không hợp lệ. Vui lòng nhập lại.");
+                }
             }
 
-            UpdateEventInDatabase(eventId, newTitle, newDescription, newLocation, newStartDate, newEndDate);
+            // Cập nhật sự kiện trong database
+            using (SqlConnection updateConnection = DatabaseConnection.GetConnection())
+            {
+                string updateQuery = @"
+            UPDATE Events 
+            SET Title = ISNULL(@NewTitle, Title), 
+                Description = ISNULL(@NewDescription, Description), 
+                Location = ISNULL(@NewLocation, Location), 
+                StartDate = ISNULL(@NewStartDate, StartDate), 
+                EndDate = ISNULL(@NewEndDate, EndDate),
+                IsActive = ISNULL(@IsActive, IsActive) 
+            WHERE Id = @EventId";
+
+                using (SqlCommand updateCommand = new SqlCommand(updateQuery, updateConnection))
+                {
+                    updateCommand.Parameters.AddWithValue("@NewTitle", (object)newTitle ?? DBNull.Value);
+                    updateCommand.Parameters.AddWithValue("@NewDescription", (object)newDescription ?? DBNull.Value);
+                    updateCommand.Parameters.AddWithValue("@NewLocation", (object)newLocation ?? DBNull.Value);
+                    updateCommand.Parameters.AddWithValue("@NewStartDate", (object)newStartDate ?? DBNull.Value);
+                    updateCommand.Parameters.AddWithValue("@NewEndDate", (object)newEndDate ?? DBNull.Value);
+                    updateCommand.Parameters.AddWithValue("@EventId", eventId);
+
+                    // Giả sử bạn muốn giữ nguyên trạng thái IsActive, có thể thêm phần để thay đổi nếu cần
+                    Console.Write("Nhập trạng thái mới (1: Kích hoạt, 0: Ngưng hoạt động, bỏ qua nếu không muốn thay đổi): ");
+                    string activeInput = Console.ReadLine();
+                    if (string.IsNullOrEmpty(activeInput))
+                    {
+                        updateCommand.Parameters.AddWithValue("@IsActive", DBNull.Value); // Giữ nguyên trạng thái
+                    }
+                    else
+                    {
+                        updateCommand.Parameters.AddWithValue("@IsActive", activeInput == "1");
+                    }
+
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
 
             Console.Clear();
             Console.WriteLine("Sửa sự kiện thành công! Nhấn phím bất kỳ để quay lại.");
             Console.ReadKey();
         }
 
-        // Cập nhật sự kiện trong database
-        private static void UpdateEventInDatabase(int eventId, string newTitle, string newDescription, string newLocation, DateTime? newStartDate, DateTime? newEndDate)
-        {
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
-            {
-                string query = "UPDATE Events SET Title = ISNULL(@NewTitle, Title), Description = ISNULL(@NewDescription, Description), Location = ISNULL(@NewLocation, Location), StartDate = ISNULL(@NewStartDate, StartDate), EndDate = ISNULL(@NewEndDate, EndDate) WHERE Id = @EventId";
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.AddWithValue("@NewTitle", (object)newTitle ?? DBNull.Value);
-                command.Parameters.AddWithValue("@NewDescription", (object)newDescription ?? DBNull.Value);
-                command.Parameters.AddWithValue("@NewLocation", (object)newLocation ?? DBNull.Value);
-                command.Parameters.AddWithValue("@NewStartDate", (object)newStartDate ?? DBNull.Value);
-                command.Parameters.AddWithValue("@NewEndDate", (object)newEndDate ?? DBNull.Value);
-                command.Parameters.AddWithValue("@EventId", eventId);
-
-                command.ExecuteNonQuery();
-            }
-        }
 
         // Chức năng xóa sự kiện
         private static void DeleteEvent()
@@ -297,58 +339,85 @@ namespace Event_UEH
                 return;
             }
 
-            Console.Write("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ");
-            char confirmation = Console.ReadKey().KeyChar;
-
-            if (char.ToLower(confirmation) == 'y')
+            // Kiểm tra sự tồn tại của sự kiện
+            if (!EventExists(eventId))
             {
-                MoveEventToTrash(eventId);
-                Console.Clear();
-                Console.WriteLine("\nXóa sự kiện thành công! Nhấn phím bất kỳ để quay lại.");
+                Console.WriteLine("Sự kiện không tồn tại. Nhấn phím bất kỳ để quay lại.");
+                Console.ReadKey();
+                return;
             }
-            else
+
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
-                Console.Clear();
-                Console.WriteLine("\nĐã hủy thao tác xóa sự kiện. Nhấn phím bất kỳ để quay lại.");
+                if (connection == null)
+                {
+                    Console.WriteLine("Không thể kết nối tới cơ sở dữ liệu.");
+                    return;
+                }
+
+                // Kiểm tra xem người dùng có phải là người tạo sự kiện không
+                string organizerCheckQuery = "SELECT OrganizerId FROM Events WHERE Id = @EventId";
+                using (SqlCommand organizerCheckCommand = new SqlCommand(organizerCheckQuery, connection))
+                {
+                    organizerCheckCommand.Parameters.AddWithValue("@EventId", eventId);
+                    var organizerId = (int)organizerCheckCommand.ExecuteScalar();
+
+                    if (organizerId != Session.CurrentUserId)
+                    {
+                        Console.WriteLine("Bạn không có quyền xóa sự kiện này. Nhấn phím bất kỳ để quay lại.");
+                        Console.ReadKey();
+                        return;
+                    }
+                }
+
+                // Lấy thông tin sự kiện từ cơ sở dữ liệu
+                string query = "SELECT Title, Description, StartDate, EndDate, Location FROM Events WHERE Id = @EventId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EventId", eventId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            // Hiển thị thông tin sự kiện
+                            Console.WriteLine("Tiêu đề: " + reader["Title"]);
+                            Console.WriteLine("Mô tả: " + reader["Description"]);
+                            Console.WriteLine("Ngày bắt đầu: " + reader["StartDate"]);
+                            Console.WriteLine("Ngày kết thúc: " + reader["EndDate"]);
+                            Console.WriteLine("Địa điểm: " + reader["Location"]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Không tìm thấy sự kiện với ID này.");
+                            Console.ReadKey();
+                            return;
+                        }
+                    }
+                }
+
+                // Hỏi người dùng có chắc chắn muốn xóa sự kiện không
+                Console.Write("Bạn có chắc chắn muốn xóa sự kiện này không? (y/n): ");
+                char confirmation = Console.ReadKey().KeyChar;
+
+                if (char.ToLower(confirmation) == 'y')
+                {
+                    // Xóa sự kiện khỏi bảng Events
+                    string deleteQuery = "DELETE FROM Events WHERE Id = @EventId";
+                    using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection))
+                    {
+                        deleteCommand.Parameters.AddWithValue("@EventId", eventId);
+                        deleteCommand.ExecuteNonQuery();
+                        Console.WriteLine("\nXóa sự kiện thành công! Nhấn phím bất kỳ để quay lại.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nĐã hủy thao tác xóa sự kiện. Nhấn phím bất kỳ để quay lại.");
+                }
             }
 
             Console.ReadKey();
-        }
-
-        private static void MoveEventToTrash(int eventId)
-        {
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
-            {
-                // Kiểm tra xem sự kiện có người đăng ký không
-                string checkRegistrationQuery = "SELECT COUNT(*) FROM RegisteredEvents WHERE EventId = @EventId";
-                SqlCommand checkCommand = new SqlCommand(checkRegistrationQuery, connection);
-                checkCommand.Parameters.AddWithValue("@EventId", eventId);
-                int registrationCount = (int)checkCommand.ExecuteScalar();
-
-                // Nếu sự kiện đã có người đăng ký, không xóa mà thông báo
-                if (registrationCount > 0)
-                {
-                    Console.WriteLine("Không thể xóa sự kiện vì đã có người đăng ký.");
-                    return; // Ngừng quá trình nếu sự kiện có người đăng ký
-                }
-
-                // Thêm sự kiện vào bảng Trash
-                string insertQuery = "INSERT INTO Trash (EventId, UserId) VALUES (@EventId, @UserId)";
-                SqlCommand insertCommand = new SqlCommand(insertQuery, connection);
-                insertCommand.Parameters.AddWithValue("@EventId", eventId);
-                insertCommand.Parameters.AddWithValue("@UserId", Session.CurrentUserId); // Sử dụng ID người dùng hiện tại
-
-                insertCommand.ExecuteNonQuery();
-
-                // Xóa sự kiện khỏi bảng Events
-                string deleteQuery = "DELETE FROM Events WHERE Id = @EventId";
-                SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection);
-                deleteCommand.Parameters.AddWithValue("@EventId", eventId);
-
-                deleteCommand.ExecuteNonQuery();
-
-                Console.WriteLine("Sự kiện đã được di chuyển vào thùng rác.");
-            }
+            ShowDashboard(); // Quay lại giao diện dashboard
         }
 
 
@@ -389,29 +458,6 @@ namespace Event_UEH
         }
 
 
-        // Xem các sự kiện đã xóa
-        private static void ViewDeletedEvents()
-        {
-            Console.Clear();
-            Console.WriteLine("=== Các sự kiện đã xóa ===");
-
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
-            {
-                string query = "SELECT * FROM Trash WHERE UserId = @UserId"; // Lấy sự kiện đã xóa của người dùng hiện tại
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@UserId", Session.CurrentUserId); // Sử dụng ID người dùng hiện tại
-
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Console.WriteLine($"ID: {reader["EventId"]} - Đã xóa bởi UserID: {reader["UserId"]}");
-                }
-            }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ShowDashboard();
-        }
 
         // Hiển thị danh sách sinh viên đã đăng ký sự kiện
         private static void ShowRegisteredStudents(int organizerId)
@@ -463,6 +509,7 @@ namespace Event_UEH
             ShowDashboard();
         }
 
+        // Phương thức hiển thị các sinh viên đã đăng ký sự kiện theo ID sự kiện và ID người tổ chức
         private static void ShowStudentDetails(int eventId, int organizerId)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -636,7 +683,7 @@ namespace Event_UEH
             Console.Clear();
             Console.WriteLine("=== Cập nhật tài khoản ===");
 
-            // Lấy thông tin hiện tại của sinh viên từ cơ sở dữ liệu
+            // Lấy thông tin hiện tại của người dùng từ cơ sở dữ liệu
             string selectQuery = "SELECT FullName, Email FROM Users WHERE Id = @userId";
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -657,7 +704,7 @@ namespace Event_UEH
                 string newFullName = Console.ReadLine();
 
                 // Nhập email mới (người dùng có thể bỏ qua)
-                string newEmail;
+                string newEmail = null;
                 while (true)
                 {
                     Console.Write("Nhập email mới (bỏ qua để giữ nguyên): ");
@@ -671,6 +718,10 @@ namespace Event_UEH
                     {
                         Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
                     }
+                    else if (User.UserExists(newEmail)) // Kiểm tra sự tồn tại của email
+                    {
+                        Console.WriteLine("Email đã tồn tại. Vui lòng nhập email khác.");
+                    }
                     else
                     {
                         break; // Email hợp lệ
@@ -678,7 +729,7 @@ namespace Event_UEH
                 }
 
                 // Nhập mật khẩu mới (người dùng có thể bỏ qua)
-                string newPassword;
+                string newPassword = null;
                 while (true)
                 {
                     Console.Write("Nhập mật khẩu mới (bỏ qua để giữ nguyên): ");
@@ -698,16 +749,39 @@ namespace Event_UEH
                     }
                 }
 
+                // Nhập tên người dùng mới (người dùng có thể bỏ qua)
+                string newUsername = null;
+                while (true)
+                {
+                    Console.Write("Nhập tên người dùng mới (bỏ qua để giữ nguyên): ");
+                    newUsername = Console.ReadLine();
+
+                    if (string.IsNullOrEmpty(newUsername))
+                    {
+                        break; // Người dùng không nhập tên người dùng
+                    }
+                    else if (User.UsernameExists(newUsername)) // Kiểm tra sự tồn tại của tên người dùng
+                    {
+                        Console.WriteLine("Tên người dùng đã tồn tại. Vui lòng nhập tên khác.");
+                    }
+                    else
+                    {
+                        break; // Tên người dùng hợp lệ
+                    }
+                }
+
                 // Cập nhật thông tin người dùng
                 string updateQuery = "UPDATE Users SET FullName = COALESCE(NULLIF(@newFullName, ''), FullName), " +
                                      "Email = COALESCE(NULLIF(@newEmail, ''), Email), " +
-                                     "Password = COALESCE(NULLIF(@newPassword, ''), Password) " +
+                                     "Password = COALESCE(NULLIF(@newPassword, ''), Password), " +
+                                     "Username = COALESCE(NULLIF(@newUsername, ''), Username) " + // Cập nhật username
                                      "WHERE Id = @userId";
                 using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                 {
                     updateCommand.Parameters.AddWithValue("@newFullName", newFullName);
                     updateCommand.Parameters.AddWithValue("@newEmail", string.IsNullOrEmpty(newEmail) ? DBNull.Value : newEmail);
                     updateCommand.Parameters.AddWithValue("@newPassword", string.IsNullOrEmpty(newPassword) ? DBNull.Value : newPassword);
+                    updateCommand.Parameters.AddWithValue("@newUsername", string.IsNullOrEmpty(newUsername) ? DBNull.Value : newUsername);
                     updateCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
 
                     try
@@ -778,6 +852,20 @@ namespace Event_UEH
             }
 
             return false; // Mật khẩu không hợp lệ
+        }
+
+        // Kiểm tra sự kiện có tồn tại không
+        private static bool EventExists(int eventId)
+        {
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                string checkQuery = "SELECT COUNT(1) FROM Events WHERE Id = @eventId";
+                using (SqlCommand command = new SqlCommand(checkQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@eventId", eventId);
+                    return (int)command.ExecuteScalar() > 0;
+                }
+            }
         }
 
 

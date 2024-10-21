@@ -99,23 +99,6 @@ namespace Event_UEH
                             PRINT 'Bảng ''RegisteredEvents'' đã được tạo.';
                         END
                     ";
-
-                    // Tạo bảng Trash
-                    string createTrashTable = @"
-                        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Trash]') AND type in (N'U'))
-                        BEGIN
-                            CREATE TABLE Trash
-                            (
-                                Id INT PRIMARY KEY IDENTITY(1,1),       -- ID tự động tăng
-                                EventId INT NOT NULL,                   -- Khóa ngoại từ bảng Events
-                                UserId INT NOT NULL,                    -- Khóa ngoại từ bảng Users
-                                FOREIGN KEY(EventId) REFERENCES Events(Id), -- Ràng buộc khóa ngoại
-                                FOREIGN KEY(UserId) REFERENCES Users(Id) -- Ràng buộc khóa ngoại
-                            );
-                            PRINT 'Bảng ''Trash'' đã được tạo.';
-                        END
-                    ";
-
                     // Tạo bảng Rate với cột Content
                     string createRateTable = @"
                         IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Rate]') AND type in (N'U'))
@@ -140,7 +123,6 @@ namespace Event_UEH
                     ExecuteNonQuery(connection, createUserRoleTable);
                     ExecuteNonQuery(connection, createEventsTable);
                     ExecuteNonQuery(connection, createRegisteredEventsTable);
-                    ExecuteNonQuery(connection, createTrashTable);
                     ExecuteNonQuery(connection, createRateTable);
                     SeedRoles(connection);
                 }

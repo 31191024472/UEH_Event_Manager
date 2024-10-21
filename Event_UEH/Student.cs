@@ -67,6 +67,12 @@ namespace Event_UEH
             }
         }
 
+        private static int gameSelection = 0; // Chỉ số lựa chọn trò chơi hiện tại
+        private static string[] gameOptions = new[]
+        {
+    "🎮 Ai Là Triệu Phú",
+    "🎮 Trò Chơi Con Rắn"
+};
         private static void ExecuteSelection(int selection)
         {
             switch (selection)
@@ -101,26 +107,7 @@ namespace Event_UEH
                     UpdateAccount(); // Gọi phương thức cập nhật thông tin tài khoản
                     break; // Quay lại vòng lặp chính
                 case 7:
-                    Console.WriteLine("What game do you want to play? 1 or 2 ");
-                    string choice = Console.ReadLine();
-                    switch (choice)
-                    {
-                        case "1":
-                            AiLaTrieuPhu.ChoiTroChoi();
-                            Console.WriteLine();
-                            Console.ReadKey();
-                            Console.Clear(); // Xóa màn hình sau khi chơi game
-                            ShowDashboard();
-                            break;
-                        case "2":
-                            Console.Clear();
-                            QuanLySuKien_UEH.TroChoiRan.BatDauTroChoiRan();
-                            Console.WriteLine();
-                            Console.ReadKey();
-                            Console.Clear(); // Xóa màn hình sau khi chơi game
-                            ShowDashboard();
-                            break;
-                    }
+                    SelectGame();
                     break; // Quay lại vòng lặp chính
                 case 8:
                     Weather();
@@ -137,29 +124,110 @@ namespace Event_UEH
                     break;
             }
         }
+        private static void SelectGame()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("=== Chọn trò chơi ===");
+                for (int i = 0; i < gameOptions.Length; i++)
+                {
+                    if (i == gameSelection)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan; // Đổi màu lựa chọn hiện tại
+                        Console.WriteLine($"> {gameOptions[i]} <"); // Hiển thị lựa chọn hiện tại với dấu mũi tên
+                        Console.ResetColor(); // Khôi phục màu sắc
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {gameOptions[i]}");
+                    }
+                }
 
+                // Kiểm tra phím được nhấn
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.UpArrow)
+                {
+                    gameSelection = (gameSelection > 0) ? gameSelection - 1 : gameOptions.Length - 1; // Di chuyển lên
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow)
+                {
+                    gameSelection = (gameSelection < gameOptions.Length - 1) ? gameSelection + 1 : 0; // Di chuyển xuống
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    ExecuteGameSelection(gameSelection); // Thực hiện lựa chọn trò chơi
+                    return; // Trở về màn hình chính sau khi chơi
+                }
+            }
+        }
+
+        private static void ExecuteGameSelection(int gameSelection)
+        {
+            switch (gameSelection)
+            {
+                case 0:
+                    AiLaTrieuPhu.ChoiTroChoi();
+                    break;
+                case 1:
+                    Console.Clear();
+                    QuanLySuKien_UEH.TroChoiRan.BatDauTroChoiRan();
+                    break;
+                default:
+                    Console.WriteLine("Lựa chọn không hợp lệ. Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    break;
+            }
+
+            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+            Console.ReadKey();
+        }
         // Chức năng đánh giá sự kiện
         private static void EvaluateEvent()
         {
             Console.Clear();
             Console.WriteLine("=== Đánh giá sự kiện ===");
-            Console.Write("Nhập ID sự kiện để đánh giá: ");
 
-            if (!int.TryParse(Console.ReadLine(), out int eventId))
+            int eventId;
+            while (true)
             {
-                Console.WriteLine("ID sự kiện không hợp lệ. Nhấn phím bất kỳ để quay lại...");
-                Console.ReadKey();
-                ShowDashboard();
-                return;
+                Console.Write("Nhập ID sự kiện để đánh giá: ");
+                if (!int.TryParse(Console.ReadLine(), out eventId))
+                {
+                    Console.WriteLine("ID sự kiện không hợp lệ. Vui lòng thử lại.");
+                    continue; // Quay lại vòng lặp để nhập lại ID
+                }
+
+                // Kiểm tra sự tồn tại của sự kiện
+                string checkQuery = "SELECT COUNT(1) FROM Events WHERE Id = @eventId";
+                using (SqlConnection connection = DatabaseConnection.GetConnection())
+                {
+                    using (SqlCommand command = new SqlCommand(checkQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@eventId", eventId);
+                        if ((int)command.ExecuteScalar() == 0)
+                        {
+                            Console.WriteLine("ID sự kiện không tồn tại. Vui lòng thử lại.");
+                            continue; // Quay lại vòng lặp nếu sự kiện không tồn tại
+                        }
+                    }
+                }
+                break; // Thoát vòng lặp nếu sự kiện tồn tại
             }
 
-            Console.Write("Nhập điểm đánh giá (1-5): ");
-            if (!int.TryParse(Console.ReadLine(), out int rating) || rating < 1 || rating > 5)
+            // Nhập điểm đánh giá
+            int rating;
+            while (true)
             {
-                Console.WriteLine("Điểm đánh giá không hợp lệ. Nhấn phím bất kỳ để quay lại...");
-                Console.ReadKey();
-                ShowDashboard();
-                return;
+                Console.Write("Nhập điểm đánh giá (1-5): ");
+                if (!int.TryParse(Console.ReadLine(), out rating) || rating < 1 || rating > 5)
+                {
+                    Console.WriteLine("Điểm đánh giá không hợp lệ. Vui lòng thử lại.");
+                }
+                else
+                {
+                    break; // Thoát vòng lặp nếu điểm hợp lệ
+                }
             }
 
             // Nhập ghi chú
@@ -167,12 +235,12 @@ namespace Event_UEH
             string content = Console.ReadLine();
 
             string insertQuery = @"
-        INSERT INTO Rate (UserId, EventId, Rating, Content) 
-        VALUES (@userId, @eventId, @rating, @content)";
+    INSERT INTO Rate (UserId, EventId, Rating, Content) 
+    VALUES (@userId, @eventId, @rating, @content)";
 
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            using (SqlConnection insertConnection = DatabaseConnection.GetConnection())
             {
-                using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection))
+                using (SqlCommand insertCommand = new SqlCommand(insertQuery, insertConnection))
                 {
                     insertCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
                     insertCommand.Parameters.AddWithValue("@eventId", eventId);
@@ -195,6 +263,7 @@ namespace Event_UEH
             Console.ReadKey();
             ShowDashboard();
         }
+
 
         // Chức năng hiển thị toàn bộ sự kiện
         private static void DisplayAllEvents()
@@ -294,8 +363,24 @@ namespace Event_UEH
         public static void RegisterEvent()
         {
             Console.WriteLine("=== Đăng ký sự kiện ===");
-            Console.Write("Nhập ID sự kiện: ");
-            int eventId = int.Parse(Console.ReadLine());
+            int eventId;
+
+            while (true)
+            {
+                Console.Write("Nhập ID sự kiện: ");
+                string input = Console.ReadLine();
+
+                // Kiểm tra nếu input không trống và có thể chuyển đổi sang số
+                if (!string.IsNullOrWhiteSpace(input) && int.TryParse(input, out eventId))
+                {
+                    break; // Thoát vòng lặp nếu ID hợp lệ
+                }
+                else
+                {
+                    Console.WriteLine("ID không hợp lệ. Vui lòng nhập lại.");
+                }
+            }
+
 
             // Kết nối tới cơ sở dữ liệu
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -358,7 +443,7 @@ namespace Event_UEH
 
                                 // Thêm bản ghi vào bảng RegisteredEvents
                                 RegisterToEvent(eventId, Session.CurrentUserId, connection);
-                                Console.WriteLine("Bạn đã đăng ký sự kiện thành công.");
+                                //Console.WriteLine("Bạn đã đăng ký sự kiện thành công.");
                             }
                             else
                             {
@@ -373,7 +458,6 @@ namespace Event_UEH
                 }
             }
             // Giữ người dùng ở lại giao diện
-            Console.WriteLine("Bạn đã đăng ký sự kiện thành công");
             Console.ReadKey();
             ShowDashboard(); // Quay lại giao diện dashboard sau khi người dùng đã thực hiện xong
         }
@@ -646,7 +730,7 @@ namespace Event_UEH
             Console.Clear();
             Console.WriteLine("=== Cập nhật tài khoản ===");
 
-            // Lấy thông tin hiện tại của sinh viên từ cơ sở dữ liệu
+            // Lấy thông tin hiện tại của người dùng từ cơ sở dữ liệu
             string selectQuery = "SELECT FullName, Email FROM Users WHERE Id = @userId";
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -667,7 +751,7 @@ namespace Event_UEH
                 string newFullName = Console.ReadLine();
 
                 // Nhập email mới (người dùng có thể bỏ qua)
-                string newEmail;
+                string newEmail = null;
                 while (true)
                 {
                     Console.Write("Nhập email mới (bỏ qua để giữ nguyên): ");
@@ -681,6 +765,10 @@ namespace Event_UEH
                     {
                         Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
                     }
+                    else if (User.UserExists(newEmail)) // Kiểm tra sự tồn tại của email
+                    {
+                        Console.WriteLine("Email đã tồn tại. Vui lòng nhập email khác.");
+                    }
                     else
                     {
                         break; // Email hợp lệ
@@ -688,7 +776,7 @@ namespace Event_UEH
                 }
 
                 // Nhập mật khẩu mới (người dùng có thể bỏ qua)
-                string newPassword;
+                string newPassword = null;
                 while (true)
                 {
                     Console.Write("Nhập mật khẩu mới (bỏ qua để giữ nguyên): ");
@@ -708,16 +796,39 @@ namespace Event_UEH
                     }
                 }
 
+                // Nhập tên người dùng mới (người dùng có thể bỏ qua)
+                string newUsername = null;
+                while (true)
+                {
+                    Console.Write("Nhập tên người dùng mới (bỏ qua để giữ nguyên): ");
+                    newUsername = Console.ReadLine();
+
+                    if (string.IsNullOrEmpty(newUsername))
+                    {
+                        break; // Người dùng không nhập tên người dùng
+                    }
+                    else if (User.UsernameExists(newUsername)) // Kiểm tra sự tồn tại của tên người dùng
+                    {
+                        Console.WriteLine("Tên người dùng đã tồn tại. Vui lòng nhập tên khác.");
+                    }
+                    else
+                    {
+                        break; // Tên người dùng hợp lệ
+                    }
+                }
+
                 // Cập nhật thông tin người dùng
                 string updateQuery = "UPDATE Users SET FullName = COALESCE(NULLIF(@newFullName, ''), FullName), " +
                                      "Email = COALESCE(NULLIF(@newEmail, ''), Email), " +
-                                     "Password = COALESCE(NULLIF(@newPassword, ''), Password) " +
+                                     "Password = COALESCE(NULLIF(@newPassword, ''), Password), " +
+                                     "Username = COALESCE(NULLIF(@newUsername, ''), Username) " + // Cập nhật username
                                      "WHERE Id = @userId";
                 using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                 {
                     updateCommand.Parameters.AddWithValue("@newFullName", newFullName);
                     updateCommand.Parameters.AddWithValue("@newEmail", string.IsNullOrEmpty(newEmail) ? DBNull.Value : newEmail);
                     updateCommand.Parameters.AddWithValue("@newPassword", string.IsNullOrEmpty(newPassword) ? DBNull.Value : newPassword);
+                    updateCommand.Parameters.AddWithValue("@newUsername", string.IsNullOrEmpty(newUsername) ? DBNull.Value : newUsername);
                     updateCommand.Parameters.AddWithValue("@userId", Session.CurrentUserId);
 
                     try
@@ -736,6 +847,7 @@ namespace Event_UEH
             Console.ReadKey();
             ShowDashboard(); // Quay lại giao diện chính sau khi cập nhật
         }
+
 
         // Kiểm tra định dạng email hợp lệ
         private static bool IsValidEmail(string email)

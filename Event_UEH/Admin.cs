@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Media;
+using System.Text;
+using System.Text.RegularExpressions;
 using static Event_UEH.User;
 
 namespace Event_UEH
@@ -276,27 +278,91 @@ namespace Event_UEH
             Console.ReadKey();
             ManageUsers();
         }
-
         // Chức năng thêm người dùng mới
         private static void ThemNguoiDung()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm người dùng mới ===");
 
-            Console.Write("Nhập tên người dùng: ");
-            string username = Console.ReadLine();
+            string username;
+            while (true)
+            {
+                Console.Write("Nhập tên người dùng: ");
+                username = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(username))
+                {
+                    break;
+                }
+                Console.WriteLine("Tên người dùng không được để trống. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập họ và tên: ");
-            string fullName = Console.ReadLine();
+            string fullName;
+            while (true)
+            {
+                Console.Write("Nhập họ và tên: ");
+                fullName = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(fullName))
+                {
+                    break;
+                }
+                Console.WriteLine("Họ và tên không được để trống. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập email: ");
-            string email = Console.ReadLine();
+            string email;
+            while (true)
+            {
+                Console.Write("Nhập email: ");
+                email = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    // Kiểm tra định dạng email
+                    if (IsValidEmail(email))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Email không được để trống. Vui lòng nhập lại.");
+                }
+            }
 
-            Console.Write("Nhập mật khẩu: ");
-            string password = Console.ReadLine();  // Trong thực tế nên mã hóa mật khẩu
+            string password;
+            string confirmPassword;
+            while (true)
+            {
+                Console.Write("Nhập mật khẩu: ");
+                password = ReadPassword();
+
+                if (!IsValidPassword(password))
+                {
+                    Console.WriteLine("Mật khẩu phải có ít nhất 8 ký tự và chứa ít nhất một số. Vui lòng thử lại.");
+                    continue;
+                }
+
+                Console.Write("Nhập lại mật khẩu: ");
+                confirmPassword = ReadPassword();
+
+                if (password == confirmPassword)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Mật khẩu không khớp. Vui lòng thử lại.");
+                }
+            }
 
             Console.Write("Nhập vai trò (1 = Admin, 2 = Tổ chức, 3 = Sinh viên): ");
-            int roleId = int.Parse(Console.ReadLine());
+            int roleId;
+            while (!int.TryParse(Console.ReadLine(), out roleId) || roleId < 1 || roleId > 3)
+            {
+                Console.WriteLine("Vai trò không hợp lệ. Vui lòng nhập lại (1 = Admin, 2 = Tổ chức, 3 = Sinh viên): ");
+            }
 
             // Câu lệnh SQL thêm giá trị FullName vào bảng
             string query = "INSERT INTO Users (Username, FullName, Email, Password, RoleId) VALUES (@username, @fullName, @email, @password, @roleId)";
@@ -305,7 +371,7 @@ namespace Event_UEH
             {
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@username", username);
-                command.Parameters.AddWithValue("@fullName", fullName);  // Thêm giá trị FullName
+                command.Parameters.AddWithValue("@fullName", fullName);
                 command.Parameters.AddWithValue("@email", email);
                 command.Parameters.AddWithValue("@password", password);  // Mã hóa nếu cần
                 command.Parameters.AddWithValue("@roleId", roleId);
@@ -324,6 +390,64 @@ namespace Event_UEH
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
             ManageUsers();
+        }
+
+        // Hàm kiểm tra định dạng email
+        private static bool IsValidEmail(string email)
+        {
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+        public static bool IsValidPassword(string password)
+        {
+            if (password.Length < 8)
+                return false;
+
+            bool hasDigit = false;
+            foreach (char c in password)
+            {
+                if (char.IsDigit(c))
+                {
+                    hasDigit = true;
+                    break;
+                }
+            }
+
+            return hasDigit;
+        }
+
+        public static string ReadPassword()
+        {
+            StringBuilder password = new StringBuilder();
+            ConsoleKeyInfo keyInfo;
+
+            do
+            {
+                keyInfo = Console.ReadKey(intercept: true);
+
+                if (keyInfo.Key != ConsoleKey.Enter &&
+                    keyInfo.Key != ConsoleKey.Spacebar &&
+                    keyInfo.Key != ConsoleKey.Backspace &&
+                    keyInfo.Key != ConsoleKey.Delete &&
+                    (keyInfo.Key < ConsoleKey.F1 || keyInfo.Key > ConsoleKey.F12) &&
+                    keyInfo.Key != ConsoleKey.Escape &&
+                    keyInfo.Key != ConsoleKey.UpArrow &&
+                    keyInfo.Key != ConsoleKey.DownArrow &&
+                    keyInfo.Key != ConsoleKey.LeftArrow &&
+                    keyInfo.Key != ConsoleKey.RightArrow)
+                {
+                    password.Append(keyInfo.KeyChar);
+                    Console.Write("*");
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
+                {
+                    password.Remove(password.Length - 1, 1);
+                    Console.Write("\b \b");
+                }
+            } while (keyInfo.Key != ConsoleKey.Enter);
+
+            Console.WriteLine();
+            return password.ToString();
         }
 
         // Chức năng xóa người dùng
@@ -516,31 +640,78 @@ namespace Event_UEH
         }
 
 
-
-        // CHức năng thêm mới sự kiện
+        //Chứ 
         private static void ThemSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm sự kiện mới ===");
 
-            Console.Write("Nhập tiêu đề sự kiện: ");
-            string title = Console.ReadLine();
+            // Nhập tiêu đề sự kiện
+            string title;
+            while (true)
+            {
+                Console.Write("Nhập tiêu đề sự kiện: ");
+                title = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(title))
+                    break;
+                Console.WriteLine("Tiêu đề sự kiện không được để trống. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập mô tả sự kiện: ");
-            string description = Console.ReadLine();
+            // Nhập mô tả sự kiện
+            string description;
+            while (true)
+            {
+                Console.Write("Nhập mô tả sự kiện: ");
+                description = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(description))
+                    break;
+                Console.WriteLine("Mô tả sự kiện không được để trống. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập địa điểm: ");
-            string location = Console.ReadLine();
+            // Nhập địa điểm
+            string location;
+            while (true)
+            {
+                Console.Write("Nhập địa điểm: ");
+                location = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(location))
+                    break;
+                Console.WriteLine("Địa điểm không được để trống. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập ngày bắt đầu (dd/MM/yyyy): ");
-            DateTime startDate = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", null);
+            // Nhập ngày bắt đầu
+            DateTime startDate;
+            while (true)
+            {
+                Console.Write("Nhập ngày bắt đầu (dd/MM/yyyy): ");
+                string startInput = Console.ReadLine();
+                if (DateTime.TryParseExact(startInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out startDate))
+                    break;
+                Console.WriteLine("Ngày bắt đầu không hợp lệ. Vui lòng nhập lại.");
+            }
 
-            Console.Write("Nhập ngày kết thúc (dd/MM/yyyy): ");
-            DateTime endDate = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", null);
+            // Nhập ngày kết thúc
+            DateTime endDate;
+            while (true)
+            {
+                Console.Write("Nhập ngày kết thúc (dd/MM/yyyy): ");
+                string endInput = Console.ReadLine();
+                if (DateTime.TryParseExact(endInput, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out endDate))
+                {
+                    if (endDate >= startDate)
+                        break;
+                    else
+                        Console.WriteLine("Ngày kết thúc phải sau ngày bắt đầu. Vui lòng nhập lại.");
+                }
+                else
+                {
+                    Console.WriteLine("Ngày kết thúc không hợp lệ. Vui lòng nhập lại.");
+                }
+            }
 
             // Lấy ID người tạo từ session
-            int createdBy = Session.CurrentUserId; // ID của tài khoản admin đã đăng nhập
-            int organizerId = Session.CurrentUserId; // Lấy luôn ID của admin cho tổ chức
+            int createdBy = Session.CurrentUserId;
+            int organizerId = Session.CurrentUserId;
 
             // Câu lệnh SQL thêm sự kiện
             string query = "INSERT INTO Events (Title, Description, Location, StartDate, EndDate, CreatedBy, OrganizerId) VALUES (@title, @description, @location, @startDate, @endDate, @createdBy, @organizerId)";
@@ -553,8 +724,8 @@ namespace Event_UEH
                 command.Parameters.AddWithValue("@location", location);
                 command.Parameters.AddWithValue("@startDate", startDate);
                 command.Parameters.AddWithValue("@endDate", endDate);
-                command.Parameters.AddWithValue("@createdBy", createdBy); // Sử dụng ID của người tạo từ session
-                command.Parameters.AddWithValue("@organizerId", organizerId); // Sử dụng ID của admin cho tổ chức
+                command.Parameters.AddWithValue("@createdBy", createdBy);
+                command.Parameters.AddWithValue("@organizerId", organizerId);
 
                 int result = command.ExecuteNonQuery();
                 if (result > 0)
@@ -571,8 +742,6 @@ namespace Event_UEH
             Console.ReadKey();
             QuanLySuKien();
         }
-
-
 
         // Chức năng chính sửa sự kiện
         private static void ChinhSuaSuKien()
@@ -836,7 +1005,7 @@ namespace Event_UEH
                 }
             }
         }
-    
+
         // Phương thức lấy số lượng sự kiện đang có
         private static string FormatNumber(int number)
         {

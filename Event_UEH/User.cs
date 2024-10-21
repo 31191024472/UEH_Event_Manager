@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Event_UEH
 {
@@ -10,7 +11,7 @@ namespace Event_UEH
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
-        public string FullName { get; set; } 
+        public string FullName { get; set; }
         public int RoleId { get; set; }
 
         public static class Session
@@ -43,11 +44,25 @@ namespace Event_UEH
             {
                 Console.Write("Nhập địa chỉ Email: ");
                 email = Console.ReadLine();
-                if (!UserExists(email))
+
+                if (string.IsNullOrWhiteSpace(email))
                 {
-                    break;
+                    Console.WriteLine("Email không được để trống. Vui lòng nhập lại.");
+                    continue;
                 }
-                Console.WriteLine("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+
+                if (IsValidEmail(email))
+                {
+                    if (!UserExists(email))
+                    {
+                        break;
+                    }
+                    Console.WriteLine("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+                }
+                else
+                {
+                    Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
+                }
             }
 
             string username;
@@ -55,6 +70,13 @@ namespace Event_UEH
             {
                 Console.Write("Nhập tên đăng nhập: ");
                 username = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("Tên đăng nhập không được để trống. Vui lòng nhập lại.");
+                    continue;
+                }
+
                 if (!UsernameExists(username)) // Kiểm tra xem username đã tồn tại chưa
                 {
                     break;
@@ -88,8 +110,19 @@ namespace Event_UEH
                 }
             }
 
-            Console.Write("Nhập họ tên: ");
-            string fullName = Console.ReadLine();
+            string fullName;
+            while (true)
+            {
+                Console.Write("Nhập họ tên: ");
+                fullName = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    Console.WriteLine("Họ tên không được để trống. Vui lòng nhập lại.");
+                    continue;
+                }
+                break;
+            }
 
             SaveUserToDatabase(username, password, email, fullName, roleId);
             Console.WriteLine("Đăng ký thành công! Nhấn phím bất kỳ để tiếp tục...");
@@ -142,7 +175,7 @@ namespace Event_UEH
             }
         }
 
-        private static bool UserExists(string email)
+        public static bool UserExists(string email)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -156,7 +189,7 @@ namespace Event_UEH
             }
         }
 
-        private static bool UsernameExists(string username)
+        public static bool UsernameExists(string username)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -353,7 +386,7 @@ namespace Event_UEH
                 keyInfo = Console.ReadKey(intercept: true);
 
                 if (keyInfo.Key != ConsoleKey.Enter &&
-                    keyInfo.Key != ConsoleKey.Spacebar &&    
+                    keyInfo.Key != ConsoleKey.Spacebar &&
                     keyInfo.Key != ConsoleKey.Backspace &&
                     keyInfo.Key != ConsoleKey.Delete &&
                     (keyInfo.Key < ConsoleKey.F1 || keyInfo.Key > ConsoleKey.F12) &&
@@ -393,6 +426,16 @@ namespace Event_UEH
             }
 
             return hasDigit;
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            // Sử dụng biểu thức chính quy để kiểm tra tính hợp lệ của email
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, emailPattern);
         }
     }
 }
