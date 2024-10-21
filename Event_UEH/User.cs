@@ -129,9 +129,11 @@ namespace Event_UEH
             Console.ReadKey();
         }
 
+        // Phương thức kiểm xác định loại tài khoản
         private static int SelectRole()
         {
-            string[] roles = { "Admin", "Sinh viên", "Tổ chức" };
+            // Chỉ hiển thị hai vai trò: "Sinh viên" và "Tổ chức"
+            string[] roles = { "Sinh viên", "Tổ chức" };
             int currentSelection = 0;
 
             while (true)
@@ -140,7 +142,7 @@ namespace Event_UEH
                 Console.ForegroundColor = ConsoleColor.Cyan;
 
                 Console.WriteLine("=============================================");
-                Console.WriteLine("              CHỌN TÀI KHOẢN                 ");
+                Console.WriteLine("              CHỌN LOẠI TÀI KHOẢN             ");
                 Console.WriteLine("=============================================");
                 Console.ResetColor();
 
@@ -170,11 +172,13 @@ namespace Event_UEH
                 }
                 else if (keyInfo.Key == ConsoleKey.Enter)
                 {
-                    return currentSelection + 1; // Trả về RoleId tương ứng (1, 2, 3)
+                    // Trả về RoleId tương ứng (2 cho Sinh viên, 3 cho Tổ chức)
+                    return currentSelection + 2;
                 }
             }
         }
 
+        // Phương Thức kiểm tra EMail đã tồn tại chưa 
         public static bool UserExists(string email)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -189,6 +193,7 @@ namespace Event_UEH
             }
         }
 
+        // Phương thức kiểm tra username đã tồn tại chưa
         public static bool UsernameExists(string username)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -203,6 +208,7 @@ namespace Event_UEH
             }
         }
 
+        // Phương thức lưu người dùng vào database 
         private static void SaveUserToDatabase(string username, string password, string email, string fullName, int roleId)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -211,7 +217,7 @@ namespace Event_UEH
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);
-                    command.Parameters.AddWithValue("@Password", password); // Nên mã hóa mật khẩu trước khi lưu
+                    command.Parameters.AddWithValue("@Password", password); 
                     command.Parameters.AddWithValue("@Email", email);
                     command.Parameters.AddWithValue("@FullName", fullName);
                     command.Parameters.AddWithValue("@RoleId", roleId);
@@ -219,7 +225,7 @@ namespace Event_UEH
                 }
             }
         }
-
+        // Phương thức xác thực người dùng 
         private static User AuthenticateUser(string username, string password)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -248,7 +254,8 @@ namespace Event_UEH
             }
             return null; // Trả về null nếu không tìm thấy người dùng
         }
-
+        
+        // Chức năng đăng ký
         public static void Login()
         {
             Console.Clear();
@@ -281,6 +288,7 @@ namespace Event_UEH
             }
         }
 
+        // phương thức xác định quyền của người dùng bằng ID đã đăng nhập 
         private static string GetRoleName(int roleId)
         {
             switch (roleId)
@@ -296,6 +304,7 @@ namespace Event_UEH
             }
         }
 
+        // Phương thức hiển thị giao diện của người dùng theo cái ROLE của tài khoản đó 
         public static void ShowDashboard(string role)
         {
             switch (role)
@@ -376,6 +385,7 @@ namespace Event_UEH
             }
         }
 
+        // Phương thức đọc pass word bỏ qua các nút đặc biệt 
         private static string ReadPassword()
         {
             StringBuilder password = new StringBuilder();
@@ -410,6 +420,7 @@ namespace Event_UEH
             return password.ToString();
         }
 
+        // Phương thức kiểm tra password có đúng yêu cầu chưa 
         private static bool IsValidPassword(string password)
         {
             if (password.Length < 8)
@@ -428,6 +439,7 @@ namespace Event_UEH
             return hasDigit;
         }
 
+        // Phương thức kiểm tra Email có đúng yêu cầu chưa 
         private static bool IsValidEmail(string email)
         {
             if (string.IsNullOrEmpty(email))

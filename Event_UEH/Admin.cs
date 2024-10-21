@@ -155,15 +155,27 @@ namespace Event_UEH
             {
                 case 0:
                     HienThiNguoiDUng();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ManageUsers();
                     break;
                 case 1:
                     ThemNguoiDung();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ManageUsers();
                     break;
                 case 2:
                     XoaNguoiDung();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ManageUsers();
                     break;
                 case 3:
                     ChinhSuaNguoiDung();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ManageUsers();
                     break;
                 case 4:
                     ShowDashboard(); // Quay lại dashboard
@@ -233,15 +245,24 @@ namespace Event_UEH
             {
                 case 0:
                     ThemSuKien();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    QuanLySuKien();
                     break;
                 case 1:
                     ChinhSuaSuKien();
                     break;
                 case 2:
                     XoaSuKien();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    QuanLySuKien();
                     break;
                 case 3:
                     HienThiAllSuKien();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    QuanLySuKien();
                     break;
                 case 4:
                     ShowDashboard(); // Quay lại dashboard
@@ -273,62 +294,55 @@ namespace Event_UEH
                 }
                 reader.Close();
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ManageUsers();
         }
         // Chức năng thêm người dùng mới
         private static void ThemNguoiDung()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm người dùng mới ===");
+            string email;
+            while (true)
+            {
+                Console.Write("Nhập địa chỉ Email: ");
+                email = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    Console.WriteLine("Email không được để trống. Vui lòng nhập lại.");
+                    continue;
+                }
+
+                if (IsValidEmail(email))
+                {
+                    if (!UserExists(email))
+                    {
+                        break;
+                    }
+                    Console.WriteLine("Email này đã được đăng ký. Vui lòng sử dụng email khác.");
+                }
+                else
+                {
+                    Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
+                }
+            }
 
             string username;
             while (true)
             {
-                Console.Write("Nhập tên người dùng: ");
+                Console.Write("Nhập tên đăng nhập: ");
                 username = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(username))
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("Tên đăng nhập không được để trống. Vui lòng nhập lại.");
+                    continue;
+                }
+
+                if (!UsernameExists(username)) // Kiểm tra xem username đã tồn tại chưa
                 {
                     break;
                 }
-                Console.WriteLine("Tên người dùng không được để trống. Vui lòng nhập lại.");
-            }
-
-            string fullName;
-            while (true)
-            {
-                Console.Write("Nhập họ và tên: ");
-                fullName = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(fullName))
-                {
-                    break;
-                }
-                Console.WriteLine("Họ và tên không được để trống. Vui lòng nhập lại.");
-            }
-
-            string email;
-            while (true)
-            {
-                Console.Write("Nhập email: ");
-                email = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(email))
-                {
-                    // Kiểm tra định dạng email
-                    if (IsValidEmail(email))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Email không được để trống. Vui lòng nhập lại.");
-                }
+                Console.WriteLine("Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.");
             }
 
             string password;
@@ -355,6 +369,18 @@ namespace Event_UEH
                 {
                     Console.WriteLine("Mật khẩu không khớp. Vui lòng thử lại.");
                 }
+            }
+
+            string fullName;
+            while (true)
+            {
+                Console.Write("Nhập họ và tên: ");
+                fullName = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(fullName))
+                {
+                    break;
+                }
+                Console.WriteLine("Họ và tên không được để trống. Vui lòng nhập lại.");
             }
 
             Console.Write("Nhập vai trò (1 = Admin, 2 = Tổ chức, 3 = Sinh viên): ");
@@ -386,10 +412,6 @@ namespace Event_UEH
                     Console.WriteLine("Thêm người dùng thất bại.");
                 }
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ManageUsers();
         }
 
         // Hàm kiểm tra định dạng email
@@ -455,7 +477,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Xóa người dùng ===");
-
+            HienThiNguoiDUng();
             // Kiểm tra nhập ID người dùng là số
             int userId;
             while (true)
@@ -490,10 +512,6 @@ namespace Event_UEH
                     Console.WriteLine("Không tìm thấy người dùng với ID này.");
                 }
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ManageUsers();
         }
 
 
@@ -502,6 +520,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Chỉnh sửa người dùng ===");
+            HienThiNguoiDUng();
 
             // Kiểm tra nhập ID người dùng là số và kiểm tra sự tồn tại trong cơ sở dữ liệu
             int userId;
@@ -633,14 +652,9 @@ namespace Event_UEH
             {
                 Console.WriteLine("Không có thay đổi nào được thực hiện.");
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ManageUsers();
         }
 
-
-        //Chứ 
+        //Chứ năng thêm sự kiện
         private static void ThemSuKien()
         {
             Console.Clear();
@@ -737,10 +751,6 @@ namespace Event_UEH
                     Console.WriteLine("Thêm sự kiện thất bại.");
                 }
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            QuanLySuKien();
         }
 
         // Chức năng chính sửa sự kiện
@@ -748,6 +758,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Sửa sự kiện ===");
+            HienThiAllSuKien();
             Console.Write("Nhập ID hoặc tên sự kiện cần sửa: ");
             string input = Console.ReadLine();
 
@@ -860,10 +871,6 @@ namespace Event_UEH
                     }
                 }
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            QuanLySuKien();
         }
 
         // Chức năng xóa sự kiện
@@ -871,6 +878,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Xóa sự kiện ===");
+            HienThiAllSuKien();
             Console.Write("Nhập ID sự kiện cần xóa: ");
             int eventId;
             if (int.TryParse(Console.ReadLine(), out eventId))
@@ -906,10 +914,6 @@ namespace Event_UEH
             {
                 Console.WriteLine("ID không hợp lệ. Vui lòng nhập lại.");
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            QuanLySuKien();
         }
 
         // Chức năng hiển thị sự kiện
@@ -970,9 +974,6 @@ namespace Event_UEH
             }
 
             Console.WriteLine(new string('-', 125)); // Đường kẻ phân cách
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            QuanLySuKien();
         }
 
         // Chức năng thống kê và báo cáo
@@ -983,10 +984,11 @@ namespace Event_UEH
                 if (connection != null)
                 {
                     int totalEvents = GetTotalEvents(connection);
-                    int ongoingEvents = GetOngoingEvents(connection);
-                    int finishedEvents = GetFinishedEvents(connection);
+                    int upcomingEvents = GetUpcomingEvents(connection);
                     int totalRegistrations = GetTotalRegistrations(connection);
                     double averageRating = GetAverageRating(connection);
+                    int totalRatings = GetTotalRatings(connection);
+                    double participationRate = GetParticipationRate(totalEvents, totalRegistrations);
 
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -994,22 +996,17 @@ namespace Event_UEH
                     Console.ResetColor();
 
                     Console.WriteLine($"Tổng số sự kiện: {FormatNumber(totalEvents)}");
-                    Console.WriteLine($"Sự kiện đang diễn ra: {FormatNumber(ongoingEvents)}");
-                    Console.WriteLine($"Sự kiện đã kết thúc: {FormatNumber(finishedEvents)}");
+                    Console.WriteLine($"Sự kiện sắp diễn ra: {FormatNumber(upcomingEvents)}");
                     Console.WriteLine($"Tổng số người đăng ký: {FormatNumber(totalRegistrations)}");
+                    Console.WriteLine($"Số lượng đánh giá: {FormatNumber(totalRatings)}");
                     Console.WriteLine($"Đánh giá trung bình: {averageRating:F2}");
+                    Console.WriteLine($"Tỷ lệ tham gia: {participationRate:F2}%");
 
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     ShowDashboard();
                 }
             }
-        }
-
-        // Phương thức lấy số lượng sự kiện đang có
-        private static string FormatNumber(int number)
-        {
-            return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
         }
 
         // Phương thức để lấy tổng số sự kiện
@@ -1022,30 +1019,16 @@ namespace Event_UEH
             }
         }
 
-        // Phương thức để lấy số sự kiện đang diễn ra
-        public static int GetOngoingEvents(SqlConnection connection)
+
+        // Phương thức để lấy số sự kiện sắp diễn ra
+        public static int GetUpcomingEvents(SqlConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM RegisteredEvents WHERE Status = 'Đã đăng ký'";
+            string query = "SELECT COUNT(*) FROM Events WHERE StartDate > GETDATE()";
             using (SqlCommand command = new SqlCommand(query, connection))
             {
                 return (int)command.ExecuteScalar();
             }
         }
-
-        // Phương thức để lấy số sự kiện đã kết thúc
-        public static int GetFinishedEvents(SqlConnection connection)
-        {
-            // Truy vấn đếm số lượng sự kiện đã bị xóa trong bảng Trash
-            string query = "SELECT COUNT(*) FROM Trash";
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {
-                object result = command.ExecuteScalar();
-
-                // Kiểm tra nếu kết quả là null hoặc không có giá trị thì trả về 0, ngược lại trả về số lượng
-                return result != DBNull.Value && result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
 
         // Phương thức để lấy tổng số người đăng ký
         public static int GetTotalRegistrations(SqlConnection connection)
@@ -1067,6 +1050,29 @@ namespace Event_UEH
                 return result != DBNull.Value && result != null ? Convert.ToDouble(result) : 0.0;
             }
         }
+
+        // Phương thức để lấy tổng số đánh giá
+        public static int GetTotalRatings(SqlConnection connection)
+        {
+            string query = "SELECT COUNT(*) FROM Rate";
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                return (int)command.ExecuteScalar();
+            }
+        }
+
+        // Phương thức để tính tỷ lệ tham gia
+        public static double GetParticipationRate(int totalEvents, int totalRegistrations)
+        {
+            return totalEvents > 0 ? ((double)totalRegistrations / totalEvents) * 100 : 0;
+        }
+
+        // Phương thức định dạng số
+        private static string FormatNumber(int number)
+        {
+            return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
+        }
+
 
     }
 }

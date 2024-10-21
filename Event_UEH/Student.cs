@@ -70,7 +70,7 @@ namespace Event_UEH
         private static int gameSelection = 0; // Chỉ số lựa chọn trò chơi hiện tại
         private static string[] gameOptions = new[]
         {
-    "🎮 Ai Là Triệu Phú",
+    "🎮 Đường Lên Đỉnh UEH",
     "🎮 Trò Chơi Con Rắn"
 };
         private static void ExecuteSelection(int selection)
@@ -167,7 +167,7 @@ namespace Event_UEH
             switch (gameSelection)
             {
                 case 0:
-                    AiLaTrieuPhu.ChoiTroChoi();
+                    DuongLenDinhUEH.ChoiTroChoi();
                     break;
                 case 1:
                     Console.Clear();

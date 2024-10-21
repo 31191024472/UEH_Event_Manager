@@ -2,7 +2,7 @@
 
 namespace Event_UEH
 {
-    public class AiLaTrieuPhu
+    public class DuongLenDinhUEH
     {
         static int[] giaThuong = {
     500000, 1000000, 2000000, 3000000,

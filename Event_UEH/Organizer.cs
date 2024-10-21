@@ -72,7 +72,6 @@ namespace Event_UEH
                     break;
                 case 1:
                     EditEvent();
-                    Console.WriteLine("Sự kiện đã được chỉnh sửa! Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
                 case 2:
@@ -111,7 +110,7 @@ namespace Event_UEH
 
 
         // Chức năng thêm sự kiện
-        private static void AddEvent()
+        public static void AddEvent()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm sự kiện ===");
@@ -178,7 +177,7 @@ namespace Event_UEH
             Console.ReadKey();
         }
 
-        // Lưu sự kiện vào database
+        //Phương thức Lưu sự kiện vào database
         private static void SaveEventToDatabase(string title, string description, string location, DateTime startDate, DateTime endDate, int organizerId, int createdBy)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
@@ -202,11 +201,11 @@ namespace Event_UEH
         }
 
         // Chức năng sửa sự kiện
-        private static void EditEvent()
+        public static void EditEvent()
         {
             Console.Clear();
             Console.WriteLine("=== Sửa sự kiện ===");
-
+            ViewOrganizedEvents();
             Console.Write("Nhập ID của sự kiện bạn muốn sửa: ");
             if (!int.TryParse(Console.ReadLine(), out int eventId))
             {
@@ -215,20 +214,11 @@ namespace Event_UEH
                 return;
             }
 
-            // Kiểm tra sự tồn tại của sự kiện
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            // Kiểm tra quyền chỉnh sửa
+            if (!HasPermissionToModifyEvent(eventId))
             {
-                string checkQuery = "SELECT COUNT(1) FROM Events WHERE Id = @eventId";
-                using (SqlCommand command = new SqlCommand(checkQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@eventId", eventId);
-                    if ((int)command.ExecuteScalar() == 0)
-                    {
-                        Console.WriteLine("Sự kiện không tồn tại. Nhấn phím bất kỳ để quay lại.");
-                        Console.ReadKey();
-                        return;
-                    }
-                }
+                Console.ReadKey();
+                return;
             }
 
             Console.Write("Nhập tên mới (bỏ qua nếu không muốn thay đổi): ");
@@ -285,14 +275,14 @@ namespace Event_UEH
             using (SqlConnection updateConnection = DatabaseConnection.GetConnection())
             {
                 string updateQuery = @"
-            UPDATE Events 
-            SET Title = ISNULL(@NewTitle, Title), 
-                Description = ISNULL(@NewDescription, Description), 
-                Location = ISNULL(@NewLocation, Location), 
-                StartDate = ISNULL(@NewStartDate, StartDate), 
-                EndDate = ISNULL(@NewEndDate, EndDate),
-                IsActive = ISNULL(@IsActive, IsActive) 
-            WHERE Id = @EventId";
+        UPDATE Events 
+        SET Title = ISNULL(@NewTitle, Title), 
+            Description = ISNULL(@NewDescription, Description), 
+            Location = ISNULL(@NewLocation, Location), 
+            StartDate = ISNULL(@NewStartDate, StartDate), 
+            EndDate = ISNULL(@NewEndDate, EndDate),
+            IsActive = ISNULL(@IsActive, IsActive) 
+        WHERE Id = @EventId";
 
                 using (SqlCommand updateCommand = new SqlCommand(updateQuery, updateConnection))
                 {
@@ -326,11 +316,11 @@ namespace Event_UEH
 
 
         // Chức năng xóa sự kiện
-        private static void DeleteEvent()
+        public static void DeleteEvent()
         {
             Console.Clear();
             Console.WriteLine("=== Xóa sự kiện ===");
-
+            ViewOrganizedEvents();
             Console.Write("Nhập ID của sự kiện bạn muốn xóa: ");
             if (!int.TryParse(Console.ReadLine(), out int eventId))
             {
@@ -339,35 +329,14 @@ namespace Event_UEH
                 return;
             }
 
-            // Kiểm tra sự tồn tại của sự kiện
-            if (!EventExists(eventId))
-            {
-                Console.WriteLine("Sự kiện không tồn tại. Nhấn phím bất kỳ để quay lại.");
-                Console.ReadKey();
-                return;
-            }
-
+            // Kiểm tra sự tồn tại của sự kiện và quyền xóa
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
-                if (connection == null)
+                // Kiểm tra quyền chỉnh sửa
+                if (!HasPermissionToModifyEvent(eventId))
                 {
-                    Console.WriteLine("Không thể kết nối tới cơ sở dữ liệu.");
+                    Console.ReadKey();
                     return;
-                }
-
-                // Kiểm tra xem người dùng có phải là người tạo sự kiện không
-                string organizerCheckQuery = "SELECT OrganizerId FROM Events WHERE Id = @EventId";
-                using (SqlCommand organizerCheckCommand = new SqlCommand(organizerCheckQuery, connection))
-                {
-                    organizerCheckCommand.Parameters.AddWithValue("@EventId", eventId);
-                    var organizerId = (int)organizerCheckCommand.ExecuteScalar();
-
-                    if (organizerId != Session.CurrentUserId)
-                    {
-                        Console.WriteLine("Bạn không có quyền xóa sự kiện này. Nhấn phím bất kỳ để quay lại.");
-                        Console.ReadKey();
-                        return;
-                    }
                 }
 
                 // Lấy thông tin sự kiện từ cơ sở dữ liệu
@@ -420,6 +389,34 @@ namespace Event_UEH
             ShowDashboard(); // Quay lại giao diện dashboard
         }
 
+        // Phương thức xác định người dùng này có quyền chỉnh sửa sự kiện không
+        public static bool HasPermissionToModifyEvent(int eventId)
+        {
+            using (SqlConnection connection = DatabaseConnection.GetConnection())
+            {
+                string query = "SELECT OrganizerId FROM Events WHERE Id = @EventId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EventId", eventId);
+                    var organizerId = (int?)command.ExecuteScalar(); // Lấy OrganizerId, có thể trả về null nếu không tìm thấy sự kiện
+
+                    if (organizerId == null)
+                    {
+                        Console.WriteLine("Sự kiện không tồn tại.");
+                        return false;
+                    }
+
+                    if (organizerId != Session.CurrentUserId)
+                    {
+                        Console.WriteLine("Bạn không có quyền thao tác trên sự kiện này.");
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+        }
+
 
         // Xem các sự kiện đã tổ chức
         private static void ViewOrganizedEvents()
@@ -441,23 +438,36 @@ namespace Event_UEH
                 }
                 else
                 {
-                    Console.WriteLine($"{"ID",-5} | {"Tên sự kiện",-30} | {"Mô tả",-50} | {"Địa điểm",-20} | {"Ngày bắt đầu",-15} | {"Ngày kết thúc",-15}");
-                    Console.WriteLine(new string('-', 140)); // Dòng phân cách
+                    int windowWidth = Console.WindowWidth; // Lấy chiều rộng hiện tại của console
+
+                    if (windowWidth >= 140) // Nếu màn hình đủ rộng, hiển thị theo hàng ngang
+                    {
+                        Console.WriteLine($"{"ID",-5} | {"Tên sự kiện",-30} | {"Mô tả",-50} | {"Địa điểm",-20} | {"Ngày bắt đầu",-15} | {"Ngày kết thúc",-15}");
+                        Console.WriteLine(new string('-', 140)); // Dòng phân cách
+                    }
 
                     while (reader.Read())
                     {
-                        Console.WriteLine($"{reader["Id"],-5} | {reader["Title"],-30} | {reader["Description"],-50} | {reader["Location"],-20} | {Convert.ToDateTime(reader["StartDate"]):dd/MM/yyyy,-15} | {Convert.ToDateTime(reader["EndDate"]):dd/MM/yyyy,-15}");
+                        if (windowWidth >= 140)
+                        {
+                            // Hiển thị theo hàng ngang khi màn hình đủ lớn
+                            Console.WriteLine($"{reader["Id"],-5} | {reader["Title"],-30} | {reader["Description"],-50} | {reader["Location"],-20} | {Convert.ToDateTime(reader["StartDate"]):dd/MM/yyyy,-15} | {Convert.ToDateTime(reader["EndDate"]):dd/MM/yyyy,-15}");
+                        }
+                        else
+                        {
+                            // Hiển thị theo cột dọc khi màn hình nhỏ
+                            Console.WriteLine($"ID: {reader["Id"]}");
+                            Console.WriteLine($"Tên sự kiện: {reader["Title"]}");
+                            Console.WriteLine($"Mô tả: {reader["Description"]}");
+                            Console.WriteLine($"Địa điểm: {reader["Location"]}");
+                            Console.WriteLine($"Ngày bắt đầu: {Convert.ToDateTime(reader["StartDate"]):dd/MM/yyyy}");
+                            Console.WriteLine($"Ngày kết thúc: {Convert.ToDateTime(reader["EndDate"]):dd/MM/yyyy}");
+                            Console.WriteLine(new string('-', 40)); // Dòng phân cách cho từng sự kiện
+                        }
                     }
                 }
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ShowDashboard();
         }
-
-
 
         // Hiển thị danh sách sinh viên đã đăng ký sự kiện
         private static void ShowRegisteredStudents(int organizerId)
