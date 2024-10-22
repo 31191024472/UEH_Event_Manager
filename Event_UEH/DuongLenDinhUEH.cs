@@ -68,7 +68,7 @@ namespace Event_UEH
             int giaTriHienTai = 0;
             int giaTriMocCuoi = 0;
 
-            Console.WriteLine("Chào mừng đến với trò chơi 'Ai Là Tỷ Phú'!\n");
+            Console.WriteLine("Chào mừng đến với trò chơi 'Đường Lên Đỉnh UEH'!\n");
 
             int[] cacCauHoiDaChon = XaoTronCauHoi(ngauNhien);
             for (int i = 0; i < cacCauHoiDaChon.Length; i++)
@@ -86,7 +86,7 @@ namespace Event_UEH
                 {
                     if (i == 19)
                     {
-                        Console.WriteLine("Chúc mừng! Bạn đã trở thành Tỷ phú và giành được 2,000,000,000 VND!");
+                        Console.WriteLine("Chúc mừng! Bạn đã giành được 2,000,000,000 VND!");
                     }
                 }
                 else
@@ -101,7 +101,7 @@ namespace Event_UEH
                 }
             }
 
-            Console.WriteLine("Cảm ơn bạn đã tham gia trò chơi 'Ai Là Tỷ Phú'!");
+            Console.WriteLine("Cảm ơn bạn đã tham gia trò chơi 'Đường Lên Đỉnh UEH'!");
         }
 
         static int[] XaoTronCauHoi(Random ngauNhien)

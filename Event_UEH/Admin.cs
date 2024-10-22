@@ -390,28 +390,9 @@ namespace Event_UEH
                 Console.WriteLine("Vai trò không hợp lệ. Vui lòng nhập lại (1 = Admin, 2 = Tổ chức, 3 = Sinh viên): ");
             }
 
-            // Câu lệnh SQL thêm giá trị FullName vào bảng
-            string query = "INSERT INTO Users (Username, FullName, Email, Password, RoleId) VALUES (@username, @fullName, @email, @password, @roleId)";
-
-            using (SqlConnection connection = DatabaseConnection.GetConnection())
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@username", username);
-                command.Parameters.AddWithValue("@fullName", fullName);
-                command.Parameters.AddWithValue("@email", email);
-                command.Parameters.AddWithValue("@password", password);  // Mã hóa nếu cần
-                command.Parameters.AddWithValue("@roleId", roleId);
-
-                int result = command.ExecuteNonQuery();
-                if (result > 0)
-                {
-                    Console.WriteLine("Thêm người dùng mới thành công.");
-                }
-                else
-                {
-                    Console.WriteLine("Thêm người dùng thất bại.");
-                }
-            }
+            SaveUserToDatabase(username, password, email, fullName, roleId);
+            Console.WriteLine("Thêm người dùng thành công ! Nhấn phím bất kỳ để tiếp tục...");
+            Console.ReadKey();
         }
 
         // Hàm kiểm tra định dạng email
@@ -654,44 +635,30 @@ namespace Event_UEH
             }
         }
 
+        // Phương thức kiểm tra giá trị đầu vào không được để trống 
+        private static string NhapThongTin(string thongDiep)
+        {
+            string input;
+            while (true)
+            {
+                Console.Write(thongDiep);
+                input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input))
+                    break;
+                Console.WriteLine("Giá trị không được để trống. Vui lòng nhập lại.");
+            }
+            return input;
+        }
+
+
         //Chứ năng thêm sự kiện
         private static void ThemSuKien()
         {
             Console.Clear();
             Console.WriteLine("=== Thêm sự kiện mới ===");
-
-            // Nhập tiêu đề sự kiện
-            string title;
-            while (true)
-            {
-                Console.Write("Nhập tiêu đề sự kiện: ");
-                title = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(title))
-                    break;
-                Console.WriteLine("Tiêu đề sự kiện không được để trống. Vui lòng nhập lại.");
-            }
-
-            // Nhập mô tả sự kiện
-            string description;
-            while (true)
-            {
-                Console.Write("Nhập mô tả sự kiện: ");
-                description = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(description))
-                    break;
-                Console.WriteLine("Mô tả sự kiện không được để trống. Vui lòng nhập lại.");
-            }
-
-            // Nhập địa điểm
-            string location;
-            while (true)
-            {
-                Console.Write("Nhập địa điểm: ");
-                location = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(location))
-                    break;
-                Console.WriteLine("Địa điểm không được để trống. Vui lòng nhập lại.");
-            }
+            string title = NhapThongTin("Nhập tiêu đề sự kiện: ");
+            string description = NhapThongTin("Nhập mô tả sự kiện: ");
+            string location = NhapThongTin("Nhập địa điểm: ");
 
             // Nhập ngày bắt đầu
             DateTime startDate;
@@ -799,16 +766,33 @@ namespace Event_UEH
                         Console.WriteLine($"Tiêu đề: {currentTitle}");
                         Console.WriteLine($"Mô tả: {currentDescription}");
                         Console.WriteLine($"Địa điểm: {currentLocation}");
-                        Console.WriteLine($"Ngày bắt đầu: {currentStartDate}");
-                        Console.WriteLine($"Ngày kết thúc: {currentEndDate}");
+                        Console.WriteLine($"Ngày bắt đầu: {currentStartDate:dd/MM/yyyy}");
+                        Console.WriteLine($"Ngày kết thúc: {currentEndDate:dd/MM/yyyy}");
 
                         // Yêu cầu nhập thông tin mới
                         Console.Write("Nhập tiêu đề mới (để trống nếu không thay đổi): ");
                         string newTitle = Console.ReadLine();
+                        if (newTitle.Length > 100) // Giới hạn độ dài tiêu đề
+                        {
+                            Console.WriteLine("Tiêu đề quá dài, giữ nguyên giá trị cũ.");
+                            newTitle = currentTitle;
+                        }
+
                         Console.Write("Nhập mô tả mới (để trống nếu không thay đổi): ");
                         string newDescription = Console.ReadLine();
+                        if (newDescription.Length > 500) // Giới hạn độ dài mô tả
+                        {
+                            Console.WriteLine("Mô tả quá dài, giữ nguyên giá trị cũ.");
+                            newDescription = currentDescription;
+                        }
+
                         Console.Write("Nhập địa điểm mới (để trống nếu không thay đổi): ");
                         string newLocation = Console.ReadLine();
+                        if (newLocation.Length > 200) // Giới hạn độ dài địa điểm
+                        {
+                            Console.WriteLine("Địa điểm quá dài, giữ nguyên giá trị cũ.");
+                            newLocation = currentLocation;
+                        }
 
                         Console.Write("Nhập ngày bắt đầu mới (dd/MM/yyyy) (để trống nếu không thay đổi): ");
                         string newStartDateInput = Console.ReadLine();
@@ -872,6 +856,7 @@ namespace Event_UEH
                 }
             }
         }
+
 
         // Chức năng xóa sự kiện
         private static void XoaSuKien()
@@ -1012,10 +997,18 @@ namespace Event_UEH
         // Phương thức để lấy tổng số sự kiện
         public static int GetTotalEvents(SqlConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM Events";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                return (int)command.ExecuteScalar();
+                string query = "SELECT COUNT(*) FROM Events";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    return (int)command.ExecuteScalar();
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Lỗi khi lấy tổng số sự kiện: " + ex.Message);
+                return -1; // Giá trị mặc định khi có lỗi
             }
         }
 
@@ -1023,55 +1016,108 @@ namespace Event_UEH
         // Phương thức để lấy số sự kiện sắp diễn ra
         public static int GetUpcomingEvents(SqlConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM Events WHERE StartDate > GETDATE()";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                return (int)command.ExecuteScalar();
+                string query = "SELECT COUNT(*) FROM Events WHERE StartDate > GETDATE()";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    return (int)command.ExecuteScalar();
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Lỗi khi lấy số sự kiện sắp diễn ra: " + ex.Message);
+                return -1; // Giá trị mặc định khi có lỗi
             }
         }
 
         // Phương thức để lấy tổng số người đăng ký
         public static int GetTotalRegistrations(SqlConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM RegisteredEvents";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                return (int)command.ExecuteScalar();
+                string query = "SELECT COUNT(*) FROM RegisteredEvents";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    return (int)command.ExecuteScalar();
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Lỗi khi lấy tổng số người đăng ký: " + ex.Message);
+                return -1; // Giá trị mặc định khi có lỗi
             }
         }
+
 
         // Phương thức để lấy đánh giá trung bình
         public static double GetAverageRating(SqlConnection connection)
         {
-            string query = "SELECT AVG(CAST(Rating AS FLOAT)) FROM Rate WHERE Rating IS NOT NULL";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                object result = command.ExecuteScalar();
-                return result != DBNull.Value && result != null ? Convert.ToDouble(result) : 0.0;
+                string query = "SELECT AVG(CAST(Rating AS FLOAT)) FROM Rate WHERE Rating IS NOT NULL";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    object result = command.ExecuteScalar();
+                    return result != DBNull.Value && result != null ? Convert.ToDouble(result) : 0.0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Lỗi khi lấy đánh giá trung bình: " + ex.Message);
+                return 0.0; // Giá trị mặc định khi có lỗi
             }
         }
+
 
         // Phương thức để lấy tổng số đánh giá
         public static int GetTotalRatings(SqlConnection connection)
         {
-            string query = "SELECT COUNT(*) FROM Rate";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                return (int)command.ExecuteScalar();
+                string query = "SELECT COUNT(*) FROM Rate";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    return (int)command.ExecuteScalar();
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Lỗi khi lấy tổng số đánh giá: " + ex.Message);
+                return -1; // Giá trị mặc định khi có lỗi
             }
         }
+
 
         // Phương thức để tính tỷ lệ tham gia
         public static double GetParticipationRate(int totalEvents, int totalRegistrations)
         {
-            return totalEvents > 0 ? ((double)totalRegistrations / totalEvents) * 100 : 0;
+            try
+            {
+                return totalEvents > 0 ? ((double)totalRegistrations / totalEvents) * 100 : 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi khi tính tỷ lệ tham gia: " + ex.Message);
+                return 0; // Giá trị mặc định khi có lỗi
+            }
         }
+
 
         // Phương thức định dạng số
         private static string FormatNumber(int number)
         {
-            return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
+            try
+            {
+                return string.Format("{0:N0}", number); // Định dạng số với dấu phân cách hàng nghìn
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi khi định dạng số: " + ex.Message);
+                return number.ToString(); // Trả về số không định dạng nếu có lỗi
+            }
         }
+
 
 
     }

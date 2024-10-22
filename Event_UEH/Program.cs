@@ -119,11 +119,14 @@ namespace Event_UEH
                             User.Register(); // Gọi phương thức đăng ký
                             break;
                         case 2:
+                            Console.Clear();
                             Console.WriteLine("Tạm biệt! Nhấn phím bất kỳ để thoát...");
                             Console.ReadKey(); // Đợi người dùng nhấn phím
-                            return; // Thoát chương trình
+                            Environment.Exit(0); // Thoát hoàn toàn khỏi chương trình
+                            break;
                     }
                 }
+                
             }
         }
 

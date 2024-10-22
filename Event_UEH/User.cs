@@ -209,7 +209,7 @@ namespace Event_UEH
         }
 
         // Phương thức lưu người dùng vào database 
-        private static void SaveUserToDatabase(string username, string password, string email, string fullName, int roleId)
+        public static void SaveUserToDatabase(string username, string password, string email, string fullName, int roleId)
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -222,6 +222,15 @@ namespace Event_UEH
                     command.Parameters.AddWithValue("@FullName", fullName);
                     command.Parameters.AddWithValue("@RoleId", roleId);
                     command.ExecuteNonQuery();
+                    int result = command.ExecuteNonQuery();
+                    if (result > 0)
+                    {
+                        Console.WriteLine("Thêm người dùng mới thành công.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Thêm người dùng thất bại.");
+                    }
                 }
             }
         }
