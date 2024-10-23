@@ -154,7 +154,7 @@ namespace Event_UEH
             switch (selection)
             {
                 case 0:
-                    HienThiNguoiDUng();
+                    HienThiNguoiDung();
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     ManageUsers();
@@ -247,22 +247,21 @@ namespace Event_UEH
                     ThemSuKien();
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    QuanLySuKien();
                     break;
                 case 1:
                     ChinhSuaSuKien();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
                     break;
                 case 2:
                     XoaSuKien();
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    QuanLySuKien();
                     break;
                 case 3:
                     HienThiAllSuKien();
                     Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
-                    QuanLySuKien();
                     break;
                 case 4:
                     ShowDashboard(); // Quay lại dashboard
@@ -276,25 +275,47 @@ namespace Event_UEH
         }
 
         // Chức năng hiển thị người dùng
-        private static void HienThiNguoiDUng()
+        private static void HienThiNguoiDung()
         {
             Console.Clear();
-            Console.WriteLine("=== Danh sách người dùng ===");
+            Console.WriteLine("=== Danh sách người dùng ===\n");
 
-            string query = "SELECT Id, Username, RoleId FROM Users";
+            // Truy vấn để lấy tất cả các thông tin cần thiết từ bảng Users
+            string query = "SELECT Id, Username, Password, Email, FullName, RoleId FROM Users";
 
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
                 SqlCommand command = new SqlCommand(query, connection);
                 SqlDataReader reader = command.ExecuteReader();
 
+                // Hiển thị tiêu đề cột
+                Console.WriteLine($"{"ID",-5} | {"Tên người dùng",-20} | {"Mật khẩu",-20} | {"Email",-30} | {"Tên đầy đủ",-20} | {"Vai trò",-10}");
+                Console.WriteLine(new string('-', 120)); // Đường phân cách
+
                 while (reader.Read())
                 {
-                    Console.WriteLine($"ID: {reader["Id"]}, Tên: {reader["Username"]}, Vai trò: {reader["RoleId"]}");
+                    // Lấy RoleId và chuyển đổi thành tên vai trò
+                    int roleId = (int)reader["RoleId"];
+                    string roleName = roleId switch
+                    {
+                        1 => "Admin",
+                        2 => "Tổ chức",
+                        3 => "Sinh viên",
+                        _ => "Không xác định" // Nếu có RoleId không hợp lệ
+                    };
+
+                    // Hiển thị thông tin người dùng với định dạng căn chỉnh đẹp mắt
+                    Console.ForegroundColor = ConsoleColor.Green; // Đổi màu cho ID
+                    Console.Write($"{reader["Id"],-5}");
+                    Console.ResetColor(); // Khôi phục màu mặc định
+                    Console.WriteLine($" | {reader["Username"],-20} | {reader["Password"],-20} | {reader["Email"],-30} | {reader["FullName"],-20} | {roleName,-10}");
                 }
                 reader.Close();
             }
+            Console.ReadKey();
         }
+
+
         // Chức năng thêm người dùng mới
         private static void ThemNguoiDung()
         {
@@ -391,7 +412,6 @@ namespace Event_UEH
             }
 
             SaveUserToDatabase(username, password, email, fullName, roleId);
-            Console.WriteLine("Thêm người dùng thành công ! Nhấn phím bất kỳ để tiếp tục...");
             Console.ReadKey();
         }
 
@@ -458,7 +478,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Xóa người dùng ===");
-            HienThiNguoiDUng();
+            HienThiNguoiDung();
             // Kiểm tra nhập ID người dùng là số
             int userId;
             while (true)
@@ -501,7 +521,7 @@ namespace Event_UEH
         {
             Console.Clear();
             Console.WriteLine("=== Chỉnh sửa người dùng ===");
-            HienThiNguoiDUng();
+            HienThiNguoiDung();
 
             // Kiểm tra nhập ID người dùng là số và kiểm tra sự tồn tại trong cơ sở dữ liệu
             int userId;
@@ -865,33 +885,58 @@ namespace Event_UEH
             Console.WriteLine("=== Xóa sự kiện ===");
             HienThiAllSuKien();
             Console.Write("Nhập ID sự kiện cần xóa: ");
+
             int eventId;
             if (int.TryParse(Console.ReadLine(), out eventId))
             {
                 using (SqlConnection connection = DatabaseConnection.GetConnection())
                 {
-                    // Xóa các bản ghi liên quan trong bảng RegisteredEvents
-                    string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE EventId = @eventId";
-                    using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
+                    // Kiểm tra sự kiện có tồn tại hay không
+                    string checkEventQuery = "SELECT COUNT(*) FROM Events WHERE Id = @eventId";
+                    using (SqlCommand checkEventCommand = new SqlCommand(checkEventQuery, connection))
                     {
-                        deleteRegisteredEventsCommand.Parameters.AddWithValue("@eventId", eventId);
-                        deleteRegisteredEventsCommand.ExecuteNonQuery();
+                        checkEventCommand.Parameters.AddWithValue("@eventId", eventId);
+                        int count = (int)checkEventCommand.ExecuteScalar();
+                        if (count == 0)
+                        {
+                            Console.WriteLine("Không tìm thấy sự kiện với ID đã nhập.");
+                            return;
+                        }
                     }
 
-                    // Xóa sự kiện
-                    string deleteEventQuery = "DELETE FROM Events WHERE Id = @eventId";
-                    using (SqlCommand deleteEventCommand = new SqlCommand(deleteEventQuery, connection))
+                    // Hỏi người dùng có muốn xóa sự kiện hay không
+                    Console.Write("Bạn có chắc chắn muốn xóa sự kiện này? (y/n): ");
+                    string confirmation = Console.ReadLine().Trim().ToLower();
+
+                    if (confirmation == "y")
                     {
-                        deleteEventCommand.Parameters.AddWithValue("@eventId", eventId);
-                        int result = deleteEventCommand.ExecuteNonQuery();
-                        if (result > 0)
+                        // Xóa các bản ghi liên quan trong bảng RegisteredEvents
+                        string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE EventId = @eventId";
+                        using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
                         {
-                            Console.WriteLine("Xóa sự kiện thành công.");
+                            deleteRegisteredEventsCommand.Parameters.AddWithValue("@eventId", eventId);
+                            deleteRegisteredEventsCommand.ExecuteNonQuery();
                         }
-                        else
+
+                        // Xóa sự kiện
+                        string deleteEventQuery = "DELETE FROM Events WHERE Id = @eventId";
+                        using (SqlCommand deleteEventCommand = new SqlCommand(deleteEventQuery, connection))
                         {
-                            Console.WriteLine("Xóa sự kiện thất bại. Có thể không tìm thấy sự kiện với ID đã nhập.");
+                            deleteEventCommand.Parameters.AddWithValue("@eventId", eventId);
+                            int result = deleteEventCommand.ExecuteNonQuery();
+                            if (result > 0)
+                            {
+                                Console.WriteLine("Xóa sự kiện thành công.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Xóa sự kiện thất bại.");
+                            }
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Hủy thao tác xóa sự kiện.");
                     }
                 }
             }

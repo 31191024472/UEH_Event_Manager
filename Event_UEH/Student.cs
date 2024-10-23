@@ -79,10 +79,10 @@ namespace Event_UEH
             {
                 case 0:
                     RegisterEvent();
+                    Console.ReadKey();
                     break;
                 case 1:
                     EvaluateEvent();
-                    Console.WriteLine("Cảm ơn bạn đã đánh giá! Nhấn phím bất kỳ để quay lại...");
                     Console.ReadKey();
                     break; // Quay lại vòng lặp chính
                 case 2:
@@ -195,7 +195,7 @@ namespace Event_UEH
                 if (!int.TryParse(Console.ReadLine(), out eventId))
                 {
                     Console.WriteLine("ID sự kiện không hợp lệ. Vui lòng thử lại.");
-                    continue; // Quay lại vòng lặp để nhập lại ID
+                    return; // Quay lại vòng lặp để nhập lại ID
                 }
 
                 // Kiểm tra sự tồn tại của sự kiện
@@ -258,7 +258,7 @@ namespace Event_UEH
                     }
                 }
             }
-
+            Console.WriteLine("Cảm ơn bạn đã đánh giá! Nhấn phím bất kỳ để quay lại...");
             Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
             Console.ReadKey();
             ShowDashboard();
@@ -381,7 +381,6 @@ namespace Event_UEH
                 }
             }
 
-
             // Kết nối tới cơ sở dữ liệu
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
@@ -443,7 +442,9 @@ namespace Event_UEH
 
                                 // Thêm bản ghi vào bảng RegisteredEvents
                                 RegisterToEvent(eventId, Session.CurrentUserId, connection);
-                                //Console.WriteLine("Bạn đã đăng ký sự kiện thành công.");
+
+                                // Thông báo đăng ký thành công
+                                Console.WriteLine("Bạn đã đăng ký sự kiện thành công.");
                             }
                             else
                             {
@@ -455,12 +456,14 @@ namespace Event_UEH
                             Console.WriteLine("Không tìm thấy sự kiện với ID này.");
                         }
                     }
+                   
                 }
+                Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                Console.ReadKey();
+                ShowDashboard();
             }
-            // Giữ người dùng ở lại giao diện
-            Console.ReadKey();
-            ShowDashboard(); // Quay lại giao diện dashboard sau khi người dùng đã thực hiện xong
         }
+
 
         // Chức năng hiển thị các sự kiện đã đăng ký
         private static void ViewRegisteredEvents()
@@ -469,7 +472,7 @@ namespace Event_UEH
             Console.WriteLine("=== Danh sách sự kiện đã đăng ký ===");
 
             // Cập nhật truy vấn SQL để lấy thêm thông tin sự kiện
-            string selectQuery = "SELECT E.Title, E.Description, E.StartDate, E.EndDate, E.Location, E.CreatedBy " +
+            string selectQuery = "SELECT E.Id, E.Title, E.Description, E.StartDate, E.EndDate, E.Location, E.CreatedBy " +
                                  "FROM Events E " +
                                  "JOIN RegisteredEvents R ON E.Id = R.EventId " +
                                  "WHERE R.UserId = @userId";
@@ -485,6 +488,9 @@ namespace Event_UEH
                         while (reader.Read())
                         {
                             // Hiển thị toàn bộ thông tin của sự kiện
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"ID: {reader["Id"]}");
+                            Console.ResetColor();
                             Console.WriteLine($"Tiêu đề: {reader["Title"]}");
                             Console.WriteLine($"Mô tả: {reader["Description"]}");
                             Console.WriteLine($"Ngày bắt đầu: {reader["StartDate"]}");

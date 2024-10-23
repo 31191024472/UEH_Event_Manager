@@ -221,11 +221,10 @@ namespace Event_UEH
                     command.Parameters.AddWithValue("@Email", email);
                     command.Parameters.AddWithValue("@FullName", fullName);
                     command.Parameters.AddWithValue("@RoleId", roleId);
-                    command.ExecuteNonQuery();
                     int result = command.ExecuteNonQuery();
                     if (result > 0)
                     {
-                        Console.WriteLine("Thêm người dùng mới thành công.");
+                        Console.WriteLine("Thêm người dùng mới thành công. Nhấn phím bất kỳ để tiếp tục...");
                     }
                     else
                     {
