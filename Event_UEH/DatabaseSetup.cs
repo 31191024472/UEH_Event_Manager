@@ -136,8 +136,8 @@ namespace Event_UEH
                 INSERT INTO Roles (RoleName)
                 VALUES
                 ('Admin'),
-                ('Organizer'),
-                ('Student')
+                ('Student'),
+                ('Organizer ')
             ";
 
             try

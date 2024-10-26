@@ -213,7 +213,8 @@ namespace Event_UEH
         {
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
-                string query = "INSERT INTO [Users] (Username, Password, Email, FullName, RoleId) VALUES (@Username, @Password, @Email, @FullName, @RoleId)";
+                string query = "INSERT INTO [Users] (Username, Password, Email, FullName, RoleId) VALUES" +
+                    " (@Username, @Password, @Email, @FullName, @RoleId)";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);

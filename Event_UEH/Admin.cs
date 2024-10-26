@@ -299,8 +299,8 @@ namespace Event_UEH
                     string roleName = roleId switch
                     {
                         1 => "Admin",
-                        2 => "Tổ chức",
-                        3 => "Sinh viên",
+                        2 => "Sinh viên",
+                        3 => "Tổ chức",
                         _ => "Không xác định" // Nếu có RoleId không hợp lệ
                     };
 
@@ -308,7 +308,8 @@ namespace Event_UEH
                     Console.ForegroundColor = ConsoleColor.Green; // Đổi màu cho ID
                     Console.Write($"{reader["Id"],-5}");
                     Console.ResetColor(); // Khôi phục màu mặc định
-                    Console.WriteLine($" | {reader["Username"],-20} | {reader["Password"],-20} | {reader["Email"],-30} | {reader["FullName"],-20} | {roleName,-10}");
+                    Console.WriteLine($" | {reader["Username"],-20} | {reader["Password"],-20} | " +
+                        $"{reader["Email"],-30} | {reader["FullName"],-20} | {roleName,-10}");
                 }
                 reader.Close();
             }
@@ -479,6 +480,7 @@ namespace Event_UEH
             Console.Clear();
             Console.WriteLine("=== Xóa người dùng ===");
             HienThiNguoiDung();
+
             // Kiểm tra nhập ID người dùng là số
             int userId;
             while (true)
@@ -496,25 +498,103 @@ namespace Event_UEH
                 }
             }
 
-            string query = "DELETE FROM Users WHERE Id = @userId";
-
             using (SqlConnection connection = DatabaseConnection.GetConnection())
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@userId", userId);
+                try
+                {
+                    // Kiểm tra các bản ghi phụ thuộc trong RegisteredEvents, Rate, và Events
+                    string checkDependenciesQuery = @"
+                SELECT COUNT(*) FROM RegisteredEvents WHERE UserId = @userId;
+                SELECT COUNT(*) FROM Rate WHERE UserId = @userId;
+                SELECT COUNT(*) FROM Events WHERE OrganizerId = @userId;";
 
-                int result = command.ExecuteNonQuery();
-                if (result > 0)
-                {
-                    Console.WriteLine("Xóa người dùng thành công.");
+                    int registeredEventCount = 0;
+                    int rateCount = 0;
+                    int eventCount = 0;
+
+                    using (SqlCommand checkDependenciesCommand = new SqlCommand(checkDependenciesQuery, connection))
+                    {
+                        checkDependenciesCommand.Parameters.AddWithValue("@userId", userId);
+
+                        using (SqlDataReader reader = checkDependenciesCommand.ExecuteReader())
+                        {
+                            if (reader.Read()) registeredEventCount = reader.GetInt32(0);
+                            if (reader.NextResult() && reader.Read()) rateCount = reader.GetInt32(0);
+                            if (reader.NextResult() && reader.Read()) eventCount = reader.GetInt32(0);
+                        }
+                    }
+
+                    // Thông báo nếu có bản ghi tham chiếu
+                    if (registeredEventCount > 0 || rateCount > 0 || eventCount > 0)
+                    {
+                        Console.WriteLine("Người dùng này có các bản ghi tham chiếu trong các bảng khác:");
+                        if (registeredEventCount > 0) Console.WriteLine($"- Số lượng sinh viên đã đăng ký sự kiện: {registeredEventCount}");
+                        if (rateCount > 0) Console.WriteLine($"- Số lượng sinh viên đã đánh giá: {rateCount}");
+                        if (eventCount > 0) Console.WriteLine($"- Bản ghi trong Events: {eventCount}");
+
+                        Console.Write("Bạn có muốn xóa sự kiện  tất cả các bản ghi liên quan không? (y/n): ");
+                        string confirmation = Console.ReadLine().Trim().ToLower();
+                        if (confirmation != "y")
+                        {
+                            Console.WriteLine("Hủy thao tác xóa người dùng.");
+                            return;
+                        }
+
+                        // Xóa các bản ghi phụ thuộc trong RegisteredEvents, Rate và Events
+                        string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE UserId = @userId";
+                        using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
+                        {
+                            deleteRegisteredEventsCommand.Parameters.AddWithValue("@userId", userId);
+                            deleteRegisteredEventsCommand.ExecuteNonQuery();
+                        }
+
+                        string deleteRateQuery = "DELETE FROM Rate WHERE UserId = @userId";
+                        using (SqlCommand deleteRateCommand = new SqlCommand(deleteRateQuery, connection))
+                        {
+                            deleteRateCommand.Parameters.AddWithValue("@userId", userId);
+                            deleteRateCommand.ExecuteNonQuery();
+                        }
+
+                        string deleteEventsQuery = "DELETE FROM Events WHERE OrganizerId = @userId";
+                        using (SqlCommand deleteEventsCommand = new SqlCommand(deleteEventsQuery, connection))
+                        {
+                            deleteEventsCommand.Parameters.AddWithValue("@userId", userId);
+                            deleteEventsCommand.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Xác nhận lần cuối cùng trước khi xóa người dùng
+                    Console.Write("Bạn có chắc chắn muốn xóa người dùng này không? (y/n): ");
+                    string finalConfirmation = Console.ReadLine().Trim().ToLower();
+                    if (finalConfirmation != "y")
+                    {
+                        Console.WriteLine("Hủy thao tác xóa người dùng.");
+                        return;
+                    }
+
+                    // Xóa người dùng
+                    string deleteUserQuery = "DELETE FROM Users WHERE Id = @userId";
+                    using (SqlCommand deleteUserCommand = new SqlCommand(deleteUserQuery, connection))
+                    {
+                        deleteUserCommand.Parameters.AddWithValue("@userId", userId);
+
+                        int result = deleteUserCommand.ExecuteNonQuery();
+                        if (result > 0)
+                        {
+                            Console.WriteLine("Xóa người dùng và các bản ghi liên quan thành công.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Không tìm thấy người dùng với ID này.");
+                        }
+                    }
                 }
-                else
+                catch (SqlException ex)
                 {
-                    Console.WriteLine("Không tìm thấy người dùng với ID này.");
+                    Console.WriteLine("Đã xảy ra lỗi khi thực hiện thao tác xóa: " + ex.Message);
                 }
             }
         }
-
 
         // Chức năng chỉnh sửa thông tin người dùng
         private static void ChinhSuaNguoiDung()
@@ -847,7 +927,8 @@ namespace Event_UEH
                         }
 
                         // Câu lệnh SQL sửa sự kiện
-                        string updateQuery = "UPDATE Events SET Title = @title, Description = @description, Location = @location, StartDate = @startDate, EndDate = @endDate WHERE Id = @eventId";
+                        string updateQuery = "UPDATE Events SET Title = @title, Description = @description, " +
+                            "Location = @location, StartDate = @startDate, EndDate = @endDate WHERE Id = @eventId";
 
                         using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
                         {
@@ -891,6 +972,7 @@ namespace Event_UEH
             {
                 using (SqlConnection connection = DatabaseConnection.GetConnection())
                 {
+
                     // Kiểm tra sự kiện có tồn tại hay không
                     string checkEventQuery = "SELECT COUNT(*) FROM Events WHERE Id = @eventId";
                     using (SqlCommand checkEventCommand = new SqlCommand(checkEventQuery, connection))
@@ -904,39 +986,81 @@ namespace Event_UEH
                         }
                     }
 
-                    // Hỏi người dùng có muốn xóa sự kiện hay không
-                    Console.Write("Bạn có chắc chắn muốn xóa sự kiện này? (y/n): ");
-                    string confirmation = Console.ReadLine().Trim().ToLower();
+                    // Kiểm tra các bản ghi phụ thuộc (ví dụ trong bảng RegisteredEvents và Rate)
+                    string checkDependenciesQuery = @"
+                SELECT COUNT(*) FROM RegisteredEvents WHERE EventId = @eventId;
+                SELECT COUNT(*) FROM Rate WHERE EventId = @eventId;";
 
-                    if (confirmation == "y")
+                    int registeredEventCount = 0;
+                    int rateCount = 0;
+
+                    using (SqlCommand checkDependenciesCommand = new SqlCommand(checkDependenciesQuery, connection))
                     {
-                        // Xóa các bản ghi liên quan trong bảng RegisteredEvents
-                        string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE EventId = @eventId";
-                        using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
-                        {
-                            deleteRegisteredEventsCommand.Parameters.AddWithValue("@eventId", eventId);
-                            deleteRegisteredEventsCommand.ExecuteNonQuery();
-                        }
+                        checkDependenciesCommand.Parameters.AddWithValue("@eventId", eventId);
 
-                        // Xóa sự kiện
-                        string deleteEventQuery = "DELETE FROM Events WHERE Id = @eventId";
-                        using (SqlCommand deleteEventCommand = new SqlCommand(deleteEventQuery, connection))
+                        // Đếm số bản ghi trong RegisteredEvents
+                        using (SqlDataReader reader = checkDependenciesCommand.ExecuteReader())
                         {
-                            deleteEventCommand.Parameters.AddWithValue("@eventId", eventId);
-                            int result = deleteEventCommand.ExecuteNonQuery();
-                            if (result > 0)
-                            {
-                                Console.WriteLine("Xóa sự kiện thành công.");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Xóa sự kiện thất bại.");
-                            }
+                            if (reader.Read()) registeredEventCount = reader.GetInt32(0);
+                            if (reader.NextResult() && reader.Read()) rateCount = reader.GetInt32(0);
+                        }
+                    }
+
+                    // Thông báo nếu có bản ghi tham chiếu
+                    if (registeredEventCount > 0 || rateCount > 0)
+                    {
+                        Console.WriteLine("Sự kiện này có bản ghi tham chiếu trong các bảng khác.");
+                        Console.WriteLine($"- Đã có sinh viên đăng ký sự kiện này: {registeredEventCount}");
+                        Console.WriteLine($"- Đã có sinh viên đánh giá sự kiện này : {rateCount}");
+                        Console.Write("Bạn có muốn xóa tất cả các bản ghi liên quan không? (y/n): ");
+
+                        string confirmation = Console.ReadLine().Trim().ToLower();
+                        if (confirmation != "y")
+                        {
+                            Console.WriteLine("Hủy thao tác xóa sự kiện.");
+                            return;
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Hủy thao tác xóa sự kiện.");
+                        Console.Write("Bạn có chắc chắn muốn xóa sự kiện này? (y/n): ");
+                        string confirmation = Console.ReadLine().Trim().ToLower();
+                        if (confirmation != "y")
+                        {
+                            Console.WriteLine("Hủy thao tác xóa sự kiện.");
+                            return;
+                        }
+                    }
+
+                    // Xóa các bản ghi liên quan trong RegisteredEvents và Rate
+                    string deleteRegisteredEventsQuery = "DELETE FROM RegisteredEvents WHERE EventId = @eventId";
+                    using (SqlCommand deleteRegisteredEventsCommand = new SqlCommand(deleteRegisteredEventsQuery, connection))
+                    {
+                        deleteRegisteredEventsCommand.Parameters.AddWithValue("@eventId", eventId);
+                        deleteRegisteredEventsCommand.ExecuteNonQuery();
+                    }
+
+                    string deleteRateQuery = "DELETE FROM Rate WHERE EventId = @eventId";
+                    using (SqlCommand deleteRateCommand = new SqlCommand(deleteRateQuery, connection))
+                    {
+                        deleteRateCommand.Parameters.AddWithValue("@eventId", eventId);
+                        deleteRateCommand.ExecuteNonQuery();
+                    }
+
+                    // Xóa sự kiện
+                    string deleteEventQuery = "DELETE FROM Events WHERE Id = @eventId";
+                    using (SqlCommand deleteEventCommand = new SqlCommand(deleteEventQuery, connection))
+                    {
+                        deleteEventCommand.Parameters.AddWithValue("@eventId", eventId);
+                        int result = deleteEventCommand.ExecuteNonQuery();
+                        if (result > 0)
+                        {
+                            Console.WriteLine("Xóa sự kiện và các bản ghi liên quan thành công.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Xóa sự kiện thất bại.");
+                        }
                     }
                 }
             }

@@ -92,6 +92,9 @@ namespace Event_UEH
                     break; // Quay lại vòng lặp chính
                 case 3:
                     CancelRegistration();
+                    Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
+                    Console.ReadKey();
+                    ShowDashboard();
                     break; // Quay lại vòng lặp chính
                 case 4:
                     SearchEvents();
@@ -511,21 +514,29 @@ namespace Event_UEH
                     }
                 }
             }
-
-            Console.WriteLine("Nhấn phím bất kỳ để quay lại...");
-            Console.ReadKey();
-            ShowDashboard();
         }
 
         // Chức năng hủy sự kiện đã đăng ký
         private static void CancelRegistration()
         {
             Console.Clear();
+            ViewRegisteredEvents();
             Console.WriteLine("=== Hủy đăng ký sự kiện ===");
             Console.Write("Nhập ID sự kiện muốn hủy: ");
             if (!int.TryParse(Console.ReadLine(), out int eventId))
             {
                 Console.WriteLine("ID sự kiện không hợp lệ. Nhấn phím bất kỳ để quay lại...");
+                Console.ReadKey();
+                ShowDashboard();
+                return;
+            }
+
+            // Xác nhận hủy đăng ký
+            Console.Write("Bạn có chắc chắn muốn hủy đăng ký sự kiện này? (Y/N): ");
+            string confirmation = Console.ReadLine();
+            if (confirmation?.ToUpper() != "Y")
+            {
+                Console.WriteLine("Hủy thao tác. Nhấn phím bất kỳ để quay lại...");
                 Console.ReadKey();
                 ShowDashboard();
                 return;
@@ -555,6 +566,7 @@ namespace Event_UEH
             Console.ReadKey();
             ShowDashboard();
         }
+
 
         private static void SearchEvents()
         {
@@ -592,7 +604,8 @@ namespace Event_UEH
                 case "2": // Tìm kiếm theo tên sự kiện
                     Console.Write("Nhập tên sự kiện: ");
                     string eventName = Console.ReadLine();
-                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Title LIKE @searchValue";
+                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, " +
+                        "CreatedBy FROM Events WHERE Title LIKE @searchValue";
                     searchParameter = new SqlParameter("@searchValue", "%" + eventName + "%");
                     break;
 
@@ -610,7 +623,8 @@ namespace Event_UEH
                 case "4": // Tìm kiếm theo địa điểm
                     Console.Write("Nhập địa điểm: ");
                     string location = Console.ReadLine();
-                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, CreatedBy FROM Events WHERE Location LIKE @searchValue";
+                    searchQuery = "SELECT Id, Title, Description, StartDate, EndDate, Location, " +
+                        "CreatedBy FROM Events WHERE Location LIKE @searchValue";
                     searchParameter = new SqlParameter("@searchValue", "%" + location + "%");
                     break;
 
