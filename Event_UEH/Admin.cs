@@ -331,7 +331,7 @@ namespace Event_UEH
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     Console.WriteLine("Email không được để trống. Vui lòng nhập lại.");
-                    continue;
+                    break;
                 }
 
                 if (IsValidEmail(email))
@@ -346,6 +346,7 @@ namespace Event_UEH
                 {
                     Console.WriteLine("Email không hợp lệ. Vui lòng nhập lại.");
                 }
+                return;
             }
 
             string username;
@@ -636,13 +637,13 @@ namespace Event_UEH
                 }
             }
 
-            Console.Write("Nhập tên người dùng mới (để trống nếu không thay đổi): ");
+            Console.Write("Nhập tên đăng nhập mới (để trống nếu không thay đổi): ");
             string newUsername = Console.ReadLine();
 
             Console.Write("Nhập mật khẩu mới (để trống nếu không thay đổi): ");
             string newPassword = Console.ReadLine();  // Mã hóa mật khẩu nếu cần
 
-            Console.Write("Nhập Email mới (để trống nếu không thay đổi): ");
+            Console.Write("Nhập email mới (để trống nếu không thay đổi): ");
             string newEmail = Console.ReadLine();
 
             Console.Write("Nhập họ và tên mới (để trống nếu không thay đổi): ");
@@ -687,13 +688,13 @@ namespace Event_UEH
 
             if (!string.IsNullOrEmpty(newEmail))
             {
-                query += (hasUpdate ? ", " : "") + "Email = @Email ";
+                query += (hasUpdate ? ", " : "") + "Email = @email ";
                 hasUpdate = true;
             }
 
             if (!string.IsNullOrEmpty(newFullName))
             {
-                query += (hasUpdate ? ", " : "") + "FullName = @FullName ";
+                query += (hasUpdate ? ", " : "") + "FullName = @fullname ";
                 hasUpdate = true;
             }
 
@@ -714,8 +715,8 @@ namespace Event_UEH
                     command.Parameters.AddWithValue("@userId", userId);
                     if (!string.IsNullOrEmpty(newUsername)) command.Parameters.AddWithValue("@username", newUsername);
                     if (!string.IsNullOrEmpty(newPassword)) command.Parameters.AddWithValue("@password", newPassword);  // Mã hóa nếu cần
-                    if (!string.IsNullOrEmpty(newEmail)) command.Parameters.AddWithValue("@Email", newEmail);
-                    if (!string.IsNullOrEmpty(newFullName)) command.Parameters.AddWithValue("@FullName", newFullName);
+                    if (!string.IsNullOrEmpty(newEmail)) command.Parameters.AddWithValue("@email", newEmail);
+                    if (!string.IsNullOrEmpty(newFullName)) command.Parameters.AddWithValue("@fullname", newFullName);
                     if (newRoleId != -1) command.Parameters.AddWithValue("@roleId", newRoleId);
 
                     int result = command.ExecuteNonQuery();
@@ -734,6 +735,7 @@ namespace Event_UEH
                 Console.WriteLine("Không có thay đổi nào được thực hiện.");
             }
         }
+
 
         // Phương thức kiểm tra giá trị đầu vào không được để trống 
         private static string NhapThongTin(string thongDiep)

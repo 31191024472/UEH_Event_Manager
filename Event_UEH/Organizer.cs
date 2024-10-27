@@ -330,7 +330,7 @@ namespace Event_UEH
             }
 
             Console.Clear();
-            Console.WriteLine("Sửa sự kiện thành công! Nhấn phím bất kỳ để quay lại.");S
+            Console.WriteLine("Sửa sự kiện thành công! Nhấn phím bất kỳ để quay lại.");
             Console.ReadKey();
         }
 
